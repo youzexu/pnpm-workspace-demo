@@ -1,0 +1,9 @@
+# pnpm-workspace.yaml
+
+packages:
+  - 'packages/*'
+  - 'apps/*'
+allowBuilds:
+  core-js: true
+  core-js-pure: false
+  esbuild: true
