@@ -7,21 +7,19 @@
     <uni-badge text="1"></uni-badge>
     <uni-badge text="2" type="success" @click="bindClick"></uni-badge>
     <uni-badge text="3" type="primary" :inverted="true"></uni-badge>
-    <repo-countdown></repo-countdown>
+    <repo-Countdown></repo-Countdown>
   </view>
 </template>
 
 <script>
 import { modal } from 'monorepo-utils'
 
+
 export default {
   data() {
     return {
       title: 'Hello'
     }
-  },
-  components: {
-  
   },
   onLoad() {},
   methods: {
