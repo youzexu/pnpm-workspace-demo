@@ -28,7 +28,7 @@ export const modal = (options = {}) => {
   return new Promise(resolve => {
     // 默认的参数
     const defaultOpt = {
-      title: '提示111',
+      title: '提示',
       content: '您确定执行该操作吗?',
       confirmColor: '#f3514f'
     }
@@ -42,8 +42,8 @@ export const modal = (options = {}) => {
       complete({ confirm, cancel }) {
         // 如果用户点击了确定，通过 resolve 抛出 true
         // 如果用户点击了取消，通过 resolve 抛出 false
-    if (confirm) resolve(true)
-    if (cancel) resolve(false)
+        if (confirm) resolve(true)
+        if (cancel) resolve(false)
       }
     })
   })

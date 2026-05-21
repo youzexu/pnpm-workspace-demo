@@ -1,21 +1,31 @@
 <template>
   <view class="content">
-    <image class="logo" src="/static/logo.png"></image>
+    <image class="logo" src="/static/logo.png" @click="show"></image>
     <view class="text-area">
       <text class="title">{{ title }}</text>
     </view>
+    <repo-countdown>1</repo-countdown>
+    <repo-countdown>2</repo-countdown>
+    <repo-countdown>3</repo-countdown>
   </view>
 </template>
 
 <script>
+import { modal }from'monorepo-utils'
 export default {
   data() {
     return {
-      title: 'Hello',
+      title: 'Hello'
     }
   },
   onLoad() {},
-  methods: {},
+  methods: {
+    show() { 
+      modal({
+        showCancel:false,
+      })
+    }
+  }
 }
 </script>
 
