@@ -9,10 +9,6 @@ export default defineConfig({
       '@': resolve(__dirname, 'src')
     }
   },
-  css: {
-    // ← 新增
-    postcss: './postcss.config.js' // 适配配置
-  },
   server: {
     port: 5173,
     open: true

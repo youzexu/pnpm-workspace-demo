@@ -1,17 +1,13 @@
-<script>
-export default {
-  onLaunch: function () {
-    console.log('App Launch')
-  },
-  onShow: function () {
-    console.log('App Show')
-  },
-  onHide: function () {
-    console.log('App Hide')
-  },
-}
+<template>
+  <div id="app">
+    <myApp />
+  </div>
+</template>
+
+<script setup lang="ts" name="App">
+import myApp from'./views/my-app.vue'
+
 </script>
 
-<style>
-/*每个页面公共css */
-</style>
+
+<style scoped></style>
