@@ -7,6 +7,9 @@ export default {
       selectorBlackList: [], // 选择器黑名单，匹配的类名不转换
       minPixelValue: 1, // 小于该值的 px 不转换
       mediaQuery: false // 是否转换 @media 中的 px
+    },
+    autoprefixer: {
+      overrideBrowserslist: ['> 1%', 'last 2 versions', 'not dead']
     }
   }
 }
