@@ -2,7 +2,7 @@
   <div>
     <!-- 导航栏 -->
     <div class="navigationBar">
-      <img class="sidepng" src="@/icons/home/side.png" />
+      <img class="sidepng" src="@/icons/home/side.png" @click="openDrawer" />
       <div class="navigationBarContent">
         <div
           v-for="(item, index) in tabs"
@@ -17,7 +17,47 @@
           </div>
         </div>
       </div>
-      <img class="discoverpng" src="@/icons/home/discover.png" />
+      <img class="discoverpng" src="@/icons/home/discover.png" @click="goToSearch" />
+    </div>
+    <!-- 侧边栏 -->
+    <Drawer :isOpen="isDrawerOpen" @close="closeDrawer" />
+    <!-- 筛选框 -->
+    <div class="filter-container" :class="{ expanded: isFilterExpanded }">
+      <div class="filter-bar">
+        <div class="filter-row">
+          <div
+            v-for="item in defaultFilters"
+            :key="item.id"
+            class="filter-row-item"
+            :class="{ active: currentFilter === item.id }"
+            @click="selectFilter(item)"
+          >
+            {{ item.name }}
+          </div>
+        </div>
+        <img
+          class="dropdown-png"
+          src="@/icons/home/dropdown.png"
+          @click="toggleFilterExpand"
+          :class="{ rotated: isFilterExpanded }"
+        />
+      </div>
+      <!-- 展开的更多筛选项 -->
+      <transition name="expand">
+        <div class="filter-expand" v-if="isFilterExpanded">
+          <div class="filter-expand-row" v-for="(row, rowIndex) in filterRows" :key="rowIndex">
+            <div
+              v-for="item in row"
+              :key="item.id"
+              class="filter-row-item"
+              :class="{ active: currentFilter === item.id }"
+              @click="selectFilter(item)"
+            >
+              {{ item.name }}
+            </div>
+          </div>
+        </div>
+      </transition>
     </div>
     <!-- 主内容区域 -->
     <div class="waterfall-container">
@@ -50,7 +90,7 @@
         v-for="(item, index) in navItems"
         :key="index"
         class="nav-item"
-        @click="activeIndex = index"
+        @click="handleNavClick(item, index)"
       >
         <img
           class="nav-icon"
@@ -62,14 +102,20 @@
         </span>
       </div>
     </div>
+    <!-- 首页发布按钮 -->
+    <Publish :isOpen="isPublishOpen" @close="closePublish" />
+    <router-view />
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
+// 组件
+import Drawer from './components/drawer.vue'
+import Publish from './components/publish.vue'
+//mock数据
 import { fetchMockData } from '@/utils/mockData'
-import likeIcon from '@/icons/home/like.png'
-import notSelectedIcon from '@/icons/home/like1.png'
 
 // 未选中图标
 import homeIcon from '@/icons/home/home.png'
@@ -77,8 +123,10 @@ import knowledgeIcon from '@/icons/home/knowledge.png'
 import publishIcon from '@/icons/home/publish.png'
 import messageIcon from '@/icons/home/message.png'
 import myIcon from '@/icons/home/my.png'
+import notSelectedIcon from '@/icons/home/like1.png'
 
 // 选中图标
+import likeIcon from '@/icons/home/like.png'
 import homeActiveIcon from '@/icons/home/home1.png'
 import knowledgeActiveIcon from '@/icons/home/knowledge1.png'
 import publishActiveIcon from '@/icons/home/publish.png'
@@ -100,15 +148,139 @@ interface FeedItem {
   growthRecords: number
   isLiked: boolean
 }
+interface NaviBar {
+  label: string
+  icon: string
+  activeIcon: string
+  isPublish: boolean
+}
+interface Tab {
+  name: string
+  id: number
+}
+// 发布按钮展开/收起
+const isPublishOpen = ref(false)
+// 侧边栏展开/收起状态
+const isDrawerOpen = ref(false)
+// 当前筛选项的 ID
+const currentFilter = ref(1)
+// 筛选框展开/收起状态
+const isFilterExpanded = ref(false)
+// 导航栏选项
 const selected = ref(0)
+// 底部导航栏选项
 const activeIndex = ref(0)
-
+// 热门推荐列表
 const feedList = ref<FeedItem[]>([])
+// 加载状态
 const loading = ref(false)
+// 分页参数
 const page = ref(1)
+// 是否还有更多数据
 const hasMore = ref(true)
+// 路由实例
+const router = useRouter()
 
+// 定义筛选项数组
+const allFilters = [
+  { name: '推荐', id: 1 },
+  { name: '最新', id: 2 },
+  { name: '热门', id: 3 },
+  { name: '附近', id: 4 },
+  { name: '价格', id: 5 },
+  { name: '销量', id: 6 },
+  { name: '评分', id: 7 },
+  { name: '距离', id: 8 },
+  { name: '时间', id: 9 },
+  { name: '类型', id: 10 },
+  { name: '品牌', id: 11 },
+  { name: '材质', id: 12 },
+  { name: '尺寸', id: 13 },
+  { name: '颜色', id: 14 }
+]
+// 创建底部导航栏图标路径函数
+const navItems = [
+  {
+    icon: homeIcon,
+    activeIcon: homeActiveIcon,
+    label: '首页',
+    isPublish: false
+  },
+  {
+    icon: knowledgeIcon,
+    activeIcon: knowledgeActiveIcon,
+    label: '知识库',
+    isPublish: false
+  },
+  {
+    icon: publishIcon,
+    activeIcon: publishActiveIcon,
+    label: '',
+    isPublish: true
+  },
+  {
+    icon: messageIcon,
+    activeIcon: messageActiveIcon,
+    label: '消息',
+    isPublish: false
+  },
+  {
+    icon: myIcon,
+    activeIcon: myActiveIcon,
+    label: '我的',
+    isPublish: false
+  }
+]
+// 定义导航栏选项数组
 const tabs = [{ name: '发现' }, { name: '暂定' }, { name: '暂定' }]
+// 默认显示的5个筛选项
+const defaultFilters = computed(() => allFilters.slice(0, 5))
+// 展开时显示的更多筛选项（除了前5个）
+const moreFilters = computed(() => allFilters.slice(5))
+// 每排5个，计算行数
+const filterRows = computed(() => {
+  const rows = []
+  for (let i = 0; i < moreFilters.value.length; i += 5) {
+    rows.push(moreFilters.value.slice(i, i + 5))
+  }
+  return rows
+})
+// 跳转到搜索页面
+const goToSearch = () => {
+  router.push('/home/search')
+}
+// 打开侧边栏函数
+const openDrawer = () => {
+  isDrawerOpen.value = true
+}
+// 关闭侧边栏函数
+const closeDrawer = () => {
+  isDrawerOpen.value = false
+}
+// 处理底部导航栏点击
+const handleNavClick = (item: NaviBar, index: number) => {
+  if (item.isPublish) {
+    // 发布按钮：打开发布弹窗
+    isPublishOpen.value = true
+  } else {
+    // 普通按钮：切换选中状态
+    activeIndex.value = index
+  }
+}
+// 关闭发布弹窗
+const closePublish = () => {
+  isPublishOpen.value = false
+}
+
+// 切换展开/收起
+const toggleFilterExpand = () => {
+  isFilterExpanded.value = !isFilterExpanded.value
+}
+
+// 选择筛选项函数
+const selectFilter = (item: Tab) => {
+  currentFilter.value = item.id
+}
 // 加载数据
 const loadData = async () => {
   if (loading.value) return
@@ -130,14 +302,7 @@ const formatNumber = (num: number) => {
   if (num >= 10000) return (num / 10000).toFixed(1) + 'w'
   return num.toString()
 }
-// 创建底部导航栏图标路径函数
-const navItems = [
-  { icon: homeIcon, activeIcon: homeActiveIcon, label: '首页' },
-  { icon: knowledgeIcon, activeIcon: knowledgeActiveIcon, label: '知识库' },
-  { icon: publishIcon, activeIcon: publishActiveIcon, label: '', isPublish: true },
-  { icon: messageIcon, activeIcon: messageActiveIcon, label: '消息' },
-  { icon: myIcon, activeIcon: myActiveIcon, label: '我的' }
-]
+
 // 点赞/取消点赞函数
 const toggleLike = (item: FeedItem) => {
   if (item.isLiked) {
@@ -206,6 +371,7 @@ onMounted(() => {
   color: rgba(44, 53, 47, 0.6);
   transition: all 0.3s;
   position: relative;
+  transition: color 0.5s;
   z-index: 2;
 }
 
@@ -287,7 +453,7 @@ onMounted(() => {
 .waterfall-container {
   column-count: 2;
   column-gap: 7px;
-  margin-top: 50px;
+  margin-top: 94px;
   padding: 8px;
   margin-bottom: 60px;
   padding-bottom: 60px;
@@ -393,5 +559,112 @@ onMounted(() => {
   letter-spacing: 0px;
   color: #3d3d3d;
   z-index: 1;
+}
+/* 筛选框容器 */
+.filter-container {
+  position: fixed;
+  top: 50px;
+  left: 0;
+  width: 375px;
+  background: white;
+  z-index: 99;
+  border-bottom: 1px solid #efefef;
+  transition: border-bottom 0.3s ease;
+}
+.filter-container.expanded {
+  border-bottom: 1px solid transparent;
+}
+/* 筛选框样式 */
+.filter-bar {
+  display: flex;
+  align-items: center;
+  height: 44px;
+  background: white;
+  padding-left: 8px;
+  padding-right: 8px;
+  box-sizing: border-box;
+}
+
+.filter-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  overflow-x: auto;
+}
+
+.filter-row::-webkit-scrollbar {
+  display: none;
+}
+
+.filter-row-item {
+  width: 58px;
+  height: 28px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 12px;
+  background: #f9f9f9;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.3s;
+  box-sizing: border-box;
+  font-family: PingFang SC;
+  font-size: 12px;
+  font-weight: normal;
+  line-height: 20px;
+  letter-spacing: 0px;
+  color: #262e29;
+}
+
+.filter-row-item.active {
+  /* 选中状态 */
+  color: #37d081;
+  background: rgba(55, 208, 129, 0.1);
+}
+.dropdown-png {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-left: 11px;
+  transition: transform 0.3s ease;
+}
+.dropdown-png.rotated {
+  transform: rotate(180deg);
+}
+/* 展开的更多筛选项  */
+.filter-expand {
+  background: white;
+  padding: 0 12px 12px 8px;
+  box-sizing: border-box;
+}
+
+.filter-expand-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.filter-expand-row:last-child {
+  margin-bottom: 0;
+}
+.expand-enter-active,
+.expand-leave-active {
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.expand-enter-from,
+.expand-leave-to {
+  transform: translateY(-20px);
+  opacity: 0;
+}
+
+.expand-enter-to,
+.expand-leave-from {
+  transform: translateY(0);
+  opacity: 1;
 }
 </style>

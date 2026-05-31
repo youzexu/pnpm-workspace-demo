@@ -9,7 +9,6 @@ export interface FeedItem {
   id: number
   image: string
   title: string
-
   author: Author
   likes: number
   comments: number
