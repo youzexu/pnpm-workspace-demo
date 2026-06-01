@@ -1,9 +1,7 @@
-<!-- components/Drawer.vue -->
+  <!-- 侧边栏 -->
 <template>
   <!-- 遮罩层 -->
   <div class="drawer-overlay" :class="{ show: isOpen }" @click="closeDrawer"></div>
-
-  <!-- 侧边栏 -->
   <div class="drawer" :class="{ open: isOpen }">
     <div class="drawer-draft">
       <img class="drawer-draftpng" src="@/icons/home/draft.png" />

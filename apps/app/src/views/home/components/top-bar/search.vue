@@ -1,4 +1,4 @@
-<!-- src/views/home/components/search.vue -->
+<!-- 搜索组件 -->
 <template>
   <div class="search-container">
     <div class="search-header">
@@ -14,7 +14,7 @@
     </div>
   </div>
 </template>
-
+<script setup lang="ts"></script>
 <style scoped>
 .search-container {
   position: fixed;
