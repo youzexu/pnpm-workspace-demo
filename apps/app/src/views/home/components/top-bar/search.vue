@@ -1,20 +1,46 @@
 <!-- 搜索组件 -->
 <template>
   <div class="search-container">
-    <div class="search-header">
-      <img
-        class="search-searchpng"
-        @click="$router.back()"
-        src="@/icons/home/home-search/search.png"
-      />
-      <div class="search-input-wrapper">
-        <input type="text" placeholder="搜索点啥呢..." />
-      </div>
-      <span class="search-text">搜索</span>
-    </div>
+    <!-- 搜索头部 -->
+    <SearchHead 
+    @update:searchList="searchList = $event" 
+    @update:loading="loading = $event" 
+    />
+    <!-- 筛选部分 -->
+    <Filter />
+    <!-- 搜索结果部分 -->
+    <Search :searchList="searchList" :loading="loading" />
   </div>
 </template>
-<script setup lang="ts"></script>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+
+// 组件部分
+import Search from './search-top/search-min.vue'
+import Filter from './search-top/filter-section.vue'
+import SearchHead from './search-top/search-head.vue'
+
+interface FeedItem {
+  id: number
+  image: string
+  title: string
+  author: {
+    id: number
+    name: string
+    avatar: string
+  }
+  likes: number
+  collections: number
+  growthRecords: number
+  isLiked: boolean
+}
+
+const searchList = ref<FeedItem[]>([])
+
+const loading = ref(false)
+</script>
+
 <style scoped>
 .search-container {
   position: fixed;
@@ -24,46 +50,6 @@
   height: 100%;
   background: white;
   z-index: 200;
-}
-
-.search-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 375px;
-  height: 50px;
-  background: white;
-  padding: 0 16px;
-  box-sizing: border-box;
-}
-
-.search-input-wrapper {
-  flex: 1;
-}
-
-.search-input-wrapper input {
-  width: 100%;
-  height: 32px;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  outline: none;
-  font-size: 14px;
-  background: #f5f5f5;
-  padding: 0 12px;
-  box-sizing: border-box;
-}
-
-.search-searchpng {
-  width: 24px;
-  height: 24px;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-
-.search-text {
-  font-size: 14px;
-  color: #37d081;
-  cursor: pointer;
-  flex-shrink: 0;
+  overflow-y: auto;
 }
 </style>

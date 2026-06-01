@@ -82,7 +82,7 @@ const loadData = async () => {
 
   loading.value = true
   try {
-    const res = await fetchMockData(page.value, 30)
+    const res = await fetchMockData(page.value, 50)
     if (res.code === 200) {
       feedList.value = [...feedList.value, ...res.data.list]
       hasMore.value = res.data.hasMore

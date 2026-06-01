@@ -1,4 +1,3 @@
-<!-- src/views/knowledge-base/knowledge-base.vue -->
 <template>
   <div>
     <!-- 我的内容 -->

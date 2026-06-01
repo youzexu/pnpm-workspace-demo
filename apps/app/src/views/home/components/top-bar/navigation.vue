@@ -23,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import Drawer from './drawer.vue' // 引入侧边栏组件
+import Drawer from './drawer.vue' 
 import { useRouter } from 'vue-router'
 import { ref } from 'vue'
 // 路由实例
@@ -117,7 +117,7 @@ const closeDrawer = () => {
   width: 18.8px;
   height: 28.71px;
   background: linear-gradient(222deg, #4ef9a1 25%, rgba(78, 249, 161, 0) 97%);
-  border-radius: 50%; /* 添加圆角，变成椭圆 */
+  border-radius: 50%; 
   pointer-events: none;
 }
 </style>
