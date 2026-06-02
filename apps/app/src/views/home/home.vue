@@ -77,7 +77,7 @@ const showTopBarComponent = computed(() => {
   background: white;
 }
 
-router-view {
+.router-view {
   padding: 8px;
 }
 </style>

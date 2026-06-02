@@ -43,14 +43,18 @@ interface FeedItem {
 const emit = defineEmits<{
   (e: 'update:searchList', list: FeedItem[]): void
   (e: 'update:loading', loading: boolean): void
+  (e: 'update:keyword', keyword: string): void // 新增：传递关键词
 }>()
 const keyword = ref('')
 // 搜索
 const handleSearch = async () => {
   if (!keyword.value.trim()) {
     emit('update:searchList', [])
+    emit('update:keyword', '')
     return
   }
+  // 传递关键词给父组件
+  emit('update:keyword', keyword.value)
 
   emit('update:loading', true)
   try {

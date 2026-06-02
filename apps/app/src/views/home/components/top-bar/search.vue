@@ -2,14 +2,15 @@
 <template>
   <div class="search-container">
     <!-- 搜索头部 -->
-    <SearchHead 
-    @update:searchList="searchList = $event" 
-    @update:loading="loading = $event" 
+    <SearchHead
+      @update:searchList="searchList = $event"
+      @update:loading="loading = $event"
+      @update:keyword="searchKeyword = $event"
     />
     <!-- 筛选部分 -->
     <Filter />
     <!-- 搜索结果部分 -->
-     <router-view :searchList="searchList" :loading="loading"/>
+    <router-view :searchList="searchList" :loading="loading"  :searchKeyword="searchKeyword" />
   </div>
 </template>
 
@@ -36,7 +37,7 @@ interface FeedItem {
 }
 
 const searchList = ref<FeedItem[]>([])
-
+const searchKeyword = ref('')
 const loading = ref(false)
 </script>
 

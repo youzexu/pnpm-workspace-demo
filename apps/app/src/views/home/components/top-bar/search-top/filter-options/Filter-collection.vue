@@ -85,7 +85,7 @@ const toggleLike = (item: FeedItem) => {
   background: #f5f5f5;
   padding-bottom: 20px;
   position: relative;
-  min-height: 403px;
+  min-height: 416px;  
 }
 
 .waterfall-container {
