@@ -1,3 +1,4 @@
+<!--  -->
 <!-- 瀑布流组件 -->
 <template>
   <div class="waterfall-container">
@@ -31,8 +32,6 @@ import { ref, onMounted } from 'vue'
 import notSelectedIcon from '@/icons/home/like1.png'
 import likeIcon from '@/icons/home/like.png'
 import { fetchMockData } from '@/utils/mockData'
-
-// 计算 margin-to
 
 // 定义 FeedItem 接口
 interface FeedItem {

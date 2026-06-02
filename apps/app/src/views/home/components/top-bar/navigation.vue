@@ -8,7 +8,7 @@
         :key="index"
         class="tab-item"
         :class="{ active: selected === index }"
-        @click="selected = index"
+        @click="handleTabClick(item.path, index)"
       >
         <div class="tab-text-wrapper">
           <div class="tab-text">{{ item.name }}</div>
@@ -23,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import Drawer from './drawer.vue' 
+import Drawer from './drawer.vue'
 import { useRouter } from 'vue-router'
 import { ref } from 'vue'
 // 路由实例
@@ -33,10 +33,29 @@ const isDrawerOpen = ref(false)
 // 导航栏选项
 const selected = ref(0)
 // 定义导航栏选项数组
-const tabs = [{ name: '发现' }, { name: '关注' }, { name: '话题' }]
+const tabs = [
+  {
+    name: '发现',
+    path:'/home'
+  },
+  {
+    name: '关注',
+    path:'/home/follow'
+  },
+  {
+    name: '话题',
+    path: '/home/topic'
+  }
+]
+// 点击 Tab 跳转
+const handleTabClick = (path: string,index: number) => {
+  selected.value = index 
+  router.push(path)
+}
+
 // 跳转到搜索页面
 const goToSearch = () => {
-  router.push('/search')
+  router.push('/search/collection')
 }
 // 打开侧边栏函数
 const openDrawer = () => {
@@ -117,7 +136,7 @@ const closeDrawer = () => {
   width: 18.8px;
   height: 28.71px;
   background: linear-gradient(222deg, #4ef9a1 25%, rgba(78, 249, 161, 0) 97%);
-  border-radius: 50%; 
+  border-radius: 50%;
   pointer-events: none;
 }
 </style>

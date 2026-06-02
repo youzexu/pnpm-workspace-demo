@@ -3,11 +3,11 @@
   <!-- 遮罩层 -->
   <div class="drawer-overlay" :class="{ show: isOpen }" @click="closeDrawer"></div>
   <div class="drawer" :class="{ open: isOpen }">
-    <div class="drawer-draft">
+    <div class="drawer-draft" @click="router.push('/drafts')">
       <img class="drawer-draftpng" src="@/icons/home/draft.png" />
       <strong class="drawer-draftname">草稿箱</strong>
     </div>
-    <div class="drawer-content">
+    <div class="drawer-content" @click="router.push('/settings')">
       <img class="drawer-contentpng" src="@/icons/home/content.png" />
       <strong class="drawer-contentname">设置</strong>
     </div>
@@ -15,10 +15,13 @@
 </template>
 
 <script setup lang="ts">
+import { useRouter } from 'vue-router'
+
 defineProps<{
   isOpen: boolean
 }>()
 
+const router = useRouter()
 const emit = defineEmits(['close'])
 
 const closeDrawer = () => {

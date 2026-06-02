@@ -1,7 +1,11 @@
 <!-- 搜索头部 -->
 <template>
   <div class="search-header">
-    <img class="search-back" @click="$router.back()" src="@/icons/home/home-search/search.png" />
+    <img
+      class="search-back"
+      @click="$router.push('/home')"
+      src="@/icons/home/home-search/search.png"
+    />
     <div class="search-input-wrapper">
       <img class="input-icon" src="@/icons/home/home-search/search1.png" />
       <input
@@ -10,8 +14,9 @@
         v-model="keyword"
         @keyup.enter="handleSearch"
       />
+      <span class="search-division"></span>
+      <span class="search-text" @click="handleSearch">搜索</span>
     </div>
-    <span class="search-text" @click="handleSearch">搜索</span>
   </div>
 </template>
 
@@ -60,14 +65,12 @@ const handleSearch = async () => {
 </script>
 
 <style scoped>
-/* 搜索头部 */
 .search-header {
+  width: 375px;
+  height: 50px;
+  background: #ffffff;
   display: flex;
   align-items: center;
-  gap: 12px;
-  width: 100%;
-  height: 50px;
-  background: white;
   padding: 0 16px;
   box-sizing: border-box;
   position: sticky;
@@ -80,6 +83,7 @@ const handleSearch = async () => {
   height: 24px;
   cursor: pointer;
   flex-shrink: 0;
+  margin-right: 12px;
 }
 
 .search-input-wrapper {
@@ -89,36 +93,47 @@ const handleSearch = async () => {
 
 .input-icon {
   position: absolute;
-  left: 8px;
+  left: 12px;
   top: 50%;
   transform: translateY(-50%);
   width: 16px;
   height: 16px;
-  z-index: 1;
   pointer-events: none;
 }
 
 .search-input-wrapper input {
   width: 100%;
-  height: 32px;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
+  height: 34px;
+  border: none;
+  border-radius: 17px;
+  background: #f5f5f5;
   outline: none;
   font-size: 14px;
-  background: #f5f5f5;
   padding: 0 12px;
-  padding-left: 32px;
+  padding-left: 36px;
+  padding-right: 70px;
   box-sizing: border-box;
 }
 
-.search-input-wrapper input:focus {
-  border-color: #37d081;
+.search-division {
+  position: absolute;
+  right: 48px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 12px;
+  background: rgba(44, 53, 47, 0.4);
 }
 
 .search-text {
-  font-size: 14px;
-  color: #37d081;
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: PingFang SC;
+  font-size: 12px;
+  font-weight: 600;
+  color: #262e29;
   cursor: pointer;
-  flex-shrink: 0;
 }
 </style>

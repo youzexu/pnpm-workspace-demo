@@ -9,7 +9,7 @@
     <!-- 筛选部分 -->
     <Filter />
     <!-- 搜索结果部分 -->
-    <Search :searchList="searchList" :loading="loading" />
+     <router-view :searchList="searchList" :loading="loading"/>
   </div>
 </template>
 
@@ -17,7 +17,6 @@
 import { ref } from 'vue'
 
 // 组件部分
-import Search from './search-top/search-min.vue'
 import Filter from './search-top/filter-section.vue'
 import SearchHead from './search-top/search-head.vue'
 

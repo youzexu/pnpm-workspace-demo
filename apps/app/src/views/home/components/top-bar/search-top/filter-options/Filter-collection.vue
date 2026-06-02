@@ -1,4 +1,4 @@
-<!-- 搜索结果部分 - 瀑布流布局 -->
+<!-- 搜索结果部分 -->
 <template>
   <div class="search-results">
     <div v-if="loading" class="loading-state">
@@ -82,9 +82,10 @@ const toggleLike = (item: FeedItem) => {
 <style scoped>
 /* 搜索结果 - 瀑布流 */
 .search-results {
+  background: #f5f5f5;
   padding-bottom: 20px;
   position: relative;
-  min-height: 300px;
+  min-height: 403px;
 }
 
 .waterfall-container {

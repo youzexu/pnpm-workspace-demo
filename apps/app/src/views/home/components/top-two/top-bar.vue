@@ -46,18 +46,9 @@ const categories = [
 
 <style scoped>
 .top {
-  position: fixed;
-  left: -7px;
-  top: 50px;
+  position: relative;
   width: 375px;
   background: white;
-  z-index: 99;
-  transition: transform 0.3s ease;
-  transform: translateY(0);
-}
-
-.top.hide {
-  transform: translateY(-100%);
 }
 
 .top-bar {

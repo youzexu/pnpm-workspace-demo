@@ -7,7 +7,7 @@
         :key="item.id"
         class="search-filter-item"
         :class="{ active: activeFilter === item.id }"
-        @click="activeFilter = item.id"
+        @click="handleFilterClick(item)"
       >
         <span class="filter-name">{{ item.name }}</span>
         <img
@@ -21,12 +21,25 @@
 </template>
 <script lang="ts" setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+interface SearchFilter {
+  name: string
+  id: number
+  path: string
+} 
+
+const router = useRouter()
 const activeFilter = ref(1)
 const searchFilters = [
-  { name: '笔记', id: 1 },
-  { name: '藏品', id: 2 },
-  { name: '用户', id: 3 }
+  { name: '作品', id: 1, path: '/search/collection' },
+  { name: '用户', id: 2, path: '/search/users' }
 ]
+
+
+const handleFilterClick = (item: SearchFilter) => {
+  activeFilter.value = item.id
+  router.push(item.path)
+}
 </script>
 <style scoped>
 /* 筛选部分 */
