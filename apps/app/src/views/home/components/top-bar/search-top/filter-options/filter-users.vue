@@ -1,13 +1,13 @@
 <template>
   <div class="search-results-wrapper">
     <!-- 加载中 -->
-    <div v-if="loading" class="loading-state">
+    <div v-if="loading || isLoading" class="loading-state">
       <div class="loading-spinner"></div>
       <p>加载中...</p>
     </div>
 
     <!-- 空状态 -->
-    <div v-else-if="userList.length === 0 && !loading" class="empty-state">
+    <div v-else-if="userList.length === 0" class="empty-state">
       <img src="@/icons/home/home-search/image.png" class="empty-image" />
       <div class="empty-text">
         <p class="empty-title">这里空空的</p>
@@ -18,22 +18,19 @@
     <!-- 用户列表 -->
     <div v-else class="user-container">
       <div v-for="user in userList" :key="user.id" class="user-card">
-        <!-- 头像 -->
         <div class="user-avatar">
           <img :src="user.avatar" :alt="user.name" />
         </div>
 
-        <!-- 用户信息 -->
         <div class="user-info">
           <div class="user-name">{{ user.name }}</div>
-          <div class="user-bio">{{ user.bio }}</div>
+          <div class="user-bio">{{ user.bio || '这个人很懒，什么都没写~' }}</div>
           <div class="user-stats">
             <span class="stat-item">笔记：{{ user.notesCount }}</span>
             <span class="stat-item">藏品：{{ user.collectionsCount }}</span>
           </div>
         </div>
 
-        <!-- 关注按钮 -->
         <button
           class="follow-btn"
           :class="{
@@ -117,7 +114,7 @@ const handleFollow = async (user: UserItem) => {
   }
 }
 
-// 监听搜索关键词变化
+// 监听搜索关键词
 watch(
   () => props.searchKeyword,
   newKeyword => {
@@ -132,15 +129,15 @@ watch(
 </script>
 
 <style scoped>
-/* 最外层容器  */
+/* 整体容器 */
 .search-results-wrapper {
   background: white;
-  padding: 0px 0px;
-  position: relative;
   min-height: 416px;
+  padding: 0;
+  position: relative;
 }
 
-/* 加载状态 */
+/* ========== 加载状态 ========== */
 .loading-state {
   display: flex;
   flex-direction: column;
@@ -160,19 +157,16 @@ watch(
 }
 
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+  to { transform: rotate(360deg); }
 }
 
 .loading-state p {
   font-size: 16px;
   font-weight: 500;
-  font-family: PingFang SC;
   color: #666;
 }
 
-/* 空状态样式 */
+/* ========== 空状态 ========== */
 .empty-state {
   position: absolute;
   left: 50%;
@@ -190,151 +184,109 @@ watch(
 }
 
 .empty-title {
-  font-family: PingFang SC;
   font-size: 16px;
-  font-weight: normal;
-  line-height: 26px;
-  text-align: center;
   color: #262e29;
   margin-bottom: 4px;
 }
 
 .empty-desc {
-  font-family: PingFang SC;
   font-size: 14px;
-  font-weight: normal;
-  line-height: 22px;
-  text-align: center;
   color: rgba(44, 53, 47, 0.4);
 }
 
-/* 用户列表容器 */
+/* ========== 用户列表 ========== */
 .user-container {
   padding: 8px;
   overflow-y: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-.user-container::-webkit-scrollbar {
-  display: none;
-  width: 0;
-  height: 0;
+  max-height: calc(100vh - 120px); 
+  scrollbar-width: thin; 
 }
 
-/* 用户卡片 */
+.user-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* 用户卡片 - Flex 布局 */
 .user-card {
-  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   width: 100%;
-  height: 64px;
+  min-height: 64px;
   margin-bottom: 12px;
   background: white;
-  border-radius: 2px;
+  padding: 8px;
+  box-sizing: border-box;
 }
 
 /* 头像 */
 .user-avatar {
-  position: absolute;
-  left: 0;
-  top: 0;
+  flex-shrink: 0;
   width: 48px;
   height: 48px;
 }
 
 .user-avatar img {
-  width: 48px;
-  height: 48px;
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
   object-fit: cover;
 }
 
-/* 用户信息 */
+/* 用户信息  */
 .user-info {
-  position: absolute;
-  left: 56px;
-  top: 0;
-  width: calc(100% - 56px - 60px);
-  height: 64px;
+  flex: 1;
+  min-width: 0;
 }
 
 .user-name {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 75px;
-  height: 24px;
-  font-family: PingFang SC;
   font-size: 15px;
   font-weight: 600;
-  line-height: 24px;
   color: #262e29;
-  margin: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .user-bio {
-  position: absolute;
-  left: 0;
-  top: 24px;
-  width: 100%;
-  height: 20px;
-  font-family: PingFang SC;
   font-size: 12px;
-  font-weight: normal;
-  line-height: 20px;
   color: rgba(44, 53, 47, 0.6);
+  margin-top: 4px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .user-stats {
-  position: absolute;
-  left: 0;
-  top: 44px;
   display: flex;
   gap: 16px;
-  align-items: center;
+  margin-top: 4px;
 }
 
 .stat-item {
-  font-family: PingFang SC;
   font-size: 12px;
-  font-weight: normal;
-  line-height: 20px;
   color: #262e29;
-  white-space: nowrap;
 }
 
 /* 关注按钮 */
 .follow-btn {
-  position: absolute;
-  right: 0;
-  top: 20px;
+  flex-shrink: 0;
   width: 52px;
   height: 24px;
   border-radius: 2px;
   border: none;
   background: transparent;
   cursor: pointer;
-  font-family: PingFang SC;
   font-size: 12px;
   font-weight: 600;
-  line-height: 20px;
-  text-align: center;
   color: #30c591;
-  padding: 0;
 }
 
-/* 已关注状态 */
 .follow-btn.followed {
-  width: 52px;
   background: rgba(44, 53, 47, 0.1);
   color: rgba(44, 53, 47, 0.4);
 }
 
-/* 互相关注状态 */
 .follow-btn.mutual {
   width: 64px;
   background: rgba(44, 53, 47, 0.1);
@@ -343,5 +295,54 @@ watch(
 
 .follow-btn:hover {
   opacity: 0.8;
+}
+
+/* ========== 屏幕适配 ========== */
+@media (max-width: 350px) {
+  .user-card {
+    gap: 6px;
+    padding: 6px;
+  }
+  .user-avatar {
+    width: 40px;
+    height: 40px;
+  }
+  .user-name {
+    font-size: 14px;
+  }
+  .user-bio {
+    font-size: 11px;
+  }
+  .stat-item {
+    font-size: 11px;
+  }
+  .follow-btn {
+    width: 48px;
+    font-size: 11px;
+  }
+  .follow-btn.mutual {
+    width: 56px;
+  }
+}
+
+@media (max-width: 320px) {
+  .user-stats {
+    gap: 10px;
+  }
+}
+
+/* 横屏适配 */
+@media (orientation: landscape) and (max-height: 450px) {
+  .user-container {
+    padding: 4px;
+  }
+  .user-card {
+    min-height: 56px;
+    margin-bottom: 8px;
+  }
+  .user-avatar {
+    width: 40px;
+    height: 40px;
+  }
 }
 </style>

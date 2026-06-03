@@ -1,15 +1,16 @@
-  <!-- 侧边栏 -->
+<!-- 侧边栏 -->
 <template>
   <!-- 遮罩层 -->
   <div class="drawer-overlay" :class="{ show: isOpen }" @click="closeDrawer"></div>
+  
   <div class="drawer" :class="{ open: isOpen }">
-    <div class="drawer-draft" @click="router.push('/drafts')">
-      <img class="drawer-draftpng" src="@/icons/home/draft.png" />
-      <strong class="drawer-draftname">草稿箱</strong>
+    <div class="drawer-menu" @click="router.push('/drafts')">
+      <img class="drawer-icon" src="@/icons/home/draft.png" />
+      <span class="drawer-text">草稿箱</span>
     </div>
-    <div class="drawer-content" @click="router.push('/settings')">
-      <img class="drawer-contentpng" src="@/icons/home/content.png" />
-      <strong class="drawer-contentname">设置</strong>
+    <div class="drawer-menu" @click="router.push('/settings')">
+      <img class="drawer-icon" src="@/icons/home/content.png" />
+      <span class="drawer-text">设置</span>
     </div>
   </div>
 </template>
@@ -24,6 +25,7 @@ defineProps<{
 const router = useRouter()
 const emit = defineEmits(['close'])
 
+// 关闭侧边栏
 const closeDrawer = () => {
   emit('close')
 }
@@ -49,7 +51,7 @@ const closeDrawer = () => {
   visibility: visible;
 }
 
-/* 侧边栏样式 */
+/* 侧边栏容器 - Flex 列布局 */
 .drawer {
   position: fixed;
   top: 0;
@@ -57,10 +59,13 @@ const closeDrawer = () => {
   width: 200px;
   height: 100%;
   background: #ffffff;
-  box-shadow: 2px 0 16px 0 rgba(0, 0, 0, 0.1);
+  box-shadow: 2px 0 16px rgba(0, 0, 0, 0.1);
   z-index: 1000;
   transform: translateX(-100%);
   transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  padding: 40px 12px 0;
 }
 
 /* 打开状态 */
@@ -68,37 +73,31 @@ const closeDrawer = () => {
   transform: translateX(0);
 }
 
-.drawer-draft {
+/* 菜单项 */
+.drawer-menu {
   display: flex;
   align-items: center;
-  margin-top: 40px;
-  width: 176px;
   height: 48px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.2s ease;
 }
 
-.drawer-content {
-  display: flex;
-  align-items: center;
-  width: 176px;
-  height: 48px;
+.drawer-menu:hover {
+  background: #f5f5f5;
 }
 
-.drawer-draftpng,
-.drawer-contentpng {
-  padding: 12px;
+/* 图标 */
+.drawer-icon {
   width: 24px;
   height: 24px;
-  cursor: pointer;
+  margin-right: 12px;
 }
 
-.drawer-draftname,
-.drawer-contentname {
-  font-family: PingFang SC;
+/* 文字 */
+.drawer-text {
   font-size: 14px;
   font-weight: 600;
-  line-height: 22px;
-  letter-spacing: 0px;
   color: #262e29;
-  cursor: pointer;
 }
 </style>

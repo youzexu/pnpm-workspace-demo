@@ -90,58 +90,62 @@ const selectFilter = (item: Tab) => {
 <style scoped>
 .filter-container {
   position: relative;
-  width: 375px;
+  width: 100%;
   background: white;
+  z-index: 10;
 }
-
+/* 筛选栏 */
 .filter-bar {
   display: flex;
   align-items: center;
-  height: 44px;
+  justify-content: space-between;
+  min-height: 44px;
   background: white;
-  padding: 0 8px;
-  box-sizing: border-box;
+  padding: 0 clamp(8px, 4vw, 12px);
+  gap: clamp(8px, 3vw, 12px);
 }
-
+/* 横向滚动区域 */
 .filter-row {
   display: flex;
-  gap: 8px;
+  gap: clamp(6px, 2vw, 8px);
   align-items: center;
+  flex: 1;
   overflow-x: auto;
+  scrollbar-width: none;
 }
 
 .filter-row::-webkit-scrollbar {
   display: none;
 }
-
+/* 筛选项 */
 .filter-row-item {
-  width: 58px;
-  height: 28px;
+  flex-shrink: 0;
+  min-width: clamp(48px, 15vw, 56px);
+  height: clamp(26px, 7vh, 28px);
   border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 4px 12px;
+  padding: 4px clamp(8px, 3vw, 12px);
   background: #f9f9f9;
   cursor: pointer;
-  flex-shrink: 0;
   transition: all 0.3s;
   box-sizing: border-box;
-  font-size: 12px;
+  font-size: clamp(11px, 3.5vw, 12px);
   color: #262e29;
+  white-space: nowrap;
 }
-
+/* 激活状态 */
 .filter-row-item.active {
   color: #37d081;
   background: rgba(55, 208, 129, 0.1);
 }
-
+/* 下拉箭头 */
 .dropdown-png {
-  width: 16px;
-  height: 16px;
+  width: clamp(14px, 4vw, 16px);
+  height: clamp(14px, 4vw, 16px);
   cursor: pointer;
   flex-shrink: 0;
-  margin-left: 11px;
   transition: transform 0.3s ease;
 }
 
@@ -149,31 +153,37 @@ const selectFilter = (item: Tab) => {
   transform: rotate(180deg);
 }
 
+/* 展开内容 */
 .filter-expand {
-  background: white;
-  padding: 12px;
+  position: absolute;
+  top: 43px;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  padding: clamp(8px, 3vh, 12px);
+  z-index: 20;
 }
-
+/* 展开行 */
 .filter-expand-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 8px;
+  gap: clamp(6px, 2vw, 8px);
+  margin-bottom: clamp(6px, 2vh, 8px);
 }
 
 .filter-expand-row:last-child {
   margin-bottom: 0;
 }
 
+/* 动画效果 */
 .expand-enter-active,
 .expand-leave-active {
   transition: all 0.3s ease;
-  overflow: hidden;
 }
 
 .expand-enter-from,
 .expand-leave-to {
-  transform: translateY(-20px);
+  transform: translateY(-10px);
   opacity: 0;
 }
 
@@ -181,5 +191,45 @@ const selectFilter = (item: Tab) => {
 .expand-leave-from {
   transform: translateY(0);
   opacity: 1;
+}
+
+/* 小屏幕适配 */
+@media (max-width: 350px) {
+  .filter-row-item {
+    min-width: 44px;
+    padding: 4px 6px;
+  }
+  
+  .filter-bar {
+    gap: 6px;
+  }
+  
+  .filter-row {
+    gap: 4px;
+  }
+}
+
+/* 极窄屏幕 */
+@media (max-width: 320px) {
+  .filter-row-item {
+    min-width: 40px;
+    font-size: 10px;
+    padding: 4px 4px;
+  }
+}
+
+/* 横屏模式 */
+@media (orientation: landscape) and (max-height: 450px) {
+  .filter-bar {
+    min-height: 40px;
+  }
+  
+  .filter-row-item {
+    height: 24px;
+  }
+  
+  .filter-expand {
+    top: 40px;
+  }
 }
 </style>

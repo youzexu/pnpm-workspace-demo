@@ -1,4 +1,4 @@
-<!-- 顶部栏组件2  -->
+<!-- 顶部栏组件2 -->
 <template>
   <div class="top">
     <div class="top-bar">
@@ -32,9 +32,11 @@ import bookPng from '@/icons/home/top-two/book.png'
 import knowledgePng from '@/icons/home/top-two/knowledge.png'
 import likePng from '@/icons/home/top-two/like.png'
 import videoPng from '@/icons/home/top-two/video.png'
+
 // 当前激活的分类ID
 const activeCategory = ref(1)
-// 导入图标数据
+
+// 分类数据
 const categories = [
   { id: 1, name: '同好会', icon: likePng },
   { id: 2, name: '知芽AI', icon: aiPng },
@@ -46,42 +48,60 @@ const categories = [
 
 <style scoped>
 .top {
-  position: relative;
-  width: 375px;
+  width: 100%;
   background: white;
 }
 
 .top-bar {
-  padding: 0 8px;
+  padding: 0 clamp(8px, 4vw, 16px);
   box-sizing: border-box;
 }
 
+/* 分类列表 - 横向滚动 */
 .category-list {
   display: flex;
-  justify-content: space-between;
+  gap: clamp(8px, 3vw, 16px);
   align-items: center;
   height: 85px;
+  overflow-x: auto;
+  scrollbar-width: none;
 }
 
+.category-list::-webkit-scrollbar {
+  display: none;
+}
+
+/* 分类项 */
 .category-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 72px;
+  flex-shrink: 0;
+  width: clamp(55px, 15vw, 72px);
   cursor: pointer;
+  transition: transform 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
+.category-item:active {
+  transform: scale(0.95);
+}
+
+/* 图标容器 */
 .icon-wrapper {
   position: relative;
   margin-bottom: 4px;
 }
 
+/* 分类图标 */
 .category-icon {
-  width: 40px;
-  height: 40px;
+  width: clamp(36px, 10vw, 44px);
+  height: clamp(36px, 10vw, 44px);
   border-radius: 50%;
+  object-fit: cover;
 }
 
+/* 角标 */
 .video-badge {
   position: absolute;
   top: -9px;
@@ -91,15 +111,30 @@ const categories = [
   border-radius: 4px;
 }
 
+/* 分类名称 */
 .category-name {
-  font-family: PingFang SC;
-  font-size: 12px;
+  font-size: clamp(10px, 3vw, 12px);
   font-weight: 500;
   text-align: center;
   color: #3d3d3d;
+  white-space: nowrap;
 }
 
+/* 激活状态 */
 .category-item.active .category-name {
   color: #37d081;
+}
+
+/* 小屏幕适配 */
+@media (max-width: 350px) {
+  .category-list {
+    gap: 4px;
+  }
+  .category-item {
+    width: 52px;
+  }
+  .category-name {
+    font-size: 10px;
+  }
 }
 </style>

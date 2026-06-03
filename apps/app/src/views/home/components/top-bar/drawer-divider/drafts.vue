@@ -1,12 +1,13 @@
 <!-- 草稿箱 -->
 <template>
-  <div>
-    <div class="draft-min">
+  <div class="drafts-container">
+    <!-- 顶部导航栏 -->
+    <div class="drafts-header">
       <img class="return-icon" src="@/icons/home/drawer-divider/return.png" @click="goBack" />
-      <p class="draft-title">本地草稿</p>
+      <p class="drafts-title">本地草稿</p>
     </div>
 
-    <!-- 提示名称 -->
+    <!-- 提示信息 -->
     <div class="tip-container">
       <div class="tip-content">
         <img class="tip-icon" src="@/icons/home/drawer-divider/attention.png" />
@@ -30,104 +31,127 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
+// 返回上一页
 const goBack = () => {
   router.back()
 }
 </script>
 
 <style scoped>
-/* 通用重置 */
-.draft-min,
-.tip-container,
-.empty-container {
-  position: absolute;
-  left: 0;
-  width: 375px;
+/* 整体容器 - Flex 列布局 */
+.drafts-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  background: #ffffff;
 }
 
-/* 外层容器 */
-.draft-min {
-  top: 0;
-  height: 50px;
-  background: #ffffff;
+/* ========== 顶部导航栏 ========== */
+.drafts-header {
   display: flex;
   align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 100%;
+  height: 50px;
+  background: #ffffff;
+  flex-shrink: 0;
 }
 
+/* 返回图标 */
 .return-icon {
   position: absolute;
-  left: 8px;
-  top: 13px;
-  width: 24px;
-  height: 24px;
+  left: clamp(12px, 4vw, 16px);
+  top: 50%;
+  transform: translateY(-50%);
+  width: clamp(20px, 6vw, 24px);
+  height: clamp(20px, 6vw, 24px);
   cursor: pointer;
 }
 
-.draft-title {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  font-family: PingFang SC;
-  font-size: 15px;
-  line-height: 24px;
+/* 标题 */
+.drafts-title {
+  font-size: clamp(14px, 4vw, 16px);
+  font-weight: 500;
   text-align: center;
   color: #3d3d3d;
   margin: 0;
   white-space: nowrap;
 }
 
-/* 提示区域 */
+/* ========== 提示信息 ========== */
 .tip-container {
-  top: 58px;
-  height: 28px;
   background: rgba(55, 208, 129, 0.1);
+  padding: 6px 16px;
+  margin: 0 0;
+  flex-shrink: 0;
 }
 
 .tip-content {
   display: flex;
   align-items: center;
-  height: 100%;
-  padding-left: 16px;
+  gap: 4px;
 }
 
 .tip-icon {
   width: 16px;
   height: 16px;
-  margin-right: 4px;
+  flex-shrink: 0;
 }
 
 .tip-text {
   font-size: 12px;
-  line-height: 20px;
   color: #37d081;
+  line-height: 1.4;
 }
 
-/* 空状态 */
+/* ========== 空状态 ========== */
 .empty-container {
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 120px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
+  padding: 40px 20px;
 }
 
 .empty-image {
-  width: 100px;
-  height: 100px;
+  width: clamp(80px, 25vw, 100px);
+  height: clamp(80px, 25vw, 100px);
   margin-bottom: 16px;
 }
 
 .empty-title {
-  font-size: 16px;
-  line-height: 26px;
+  font-size: clamp(14px, 4vw, 16px);
+  font-weight: 500;
   color: #262e29;
   margin-bottom: 4px;
 }
 
 .empty-desc {
-  font-size: 14px;
-  line-height: 22px;
+  font-size: clamp(12px, 3.5vw, 14px);
   color: rgba(44, 53, 47, 0.4);
+}
+
+/* ========== 小屏幕 ========== */
+@media (max-width: 375px) {
+  .drafts-container {
+    max-width: 100%;
+  }
+}
+
+/* 横屏适配 */
+@media (orientation: landscape) and (max-height: 500px) {
+  .drafts-header {
+    height: 44px;
+  }
+  .empty-image {
+    width: 60px;
+    height: 60px;
+  }
 }
 </style>
