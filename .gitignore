@@ -69,6 +69,3 @@ cypress/downloads/
 # ==================== Vitest ====================
 __screenshots__/
 
-# ==================== 包管理器 ====================
-package-lock.json
-yarn.lock
