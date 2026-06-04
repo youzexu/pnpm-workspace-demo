@@ -137,6 +137,12 @@ const router = createRouter({
       path: '/mine',
       name: 'Mine',
       component: () => import('../views/mine/mine.vue')
+    },
+    //图片详细路由
+    {
+      path: '/picture/:id', // 添加 :id 动态参数
+      name: 'Picture',
+      component: () => import('../views/detail/picture-details.vue')
     }
   ]
 })

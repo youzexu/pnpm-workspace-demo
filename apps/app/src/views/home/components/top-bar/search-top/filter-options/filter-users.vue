@@ -9,10 +9,8 @@
     <!-- 空状态 -->
     <div v-else-if="userList.length === 0" class="empty-state">
       <img src="@/icons/home/home-search/image.png" class="empty-image" />
-      <div class="empty-text">
-        <p class="empty-title">这里空空的</p>
-        <p class="empty-desc">换个关键词试试吧</p>
-      </div>
+      <p class="empty-title">这里空空的</p>
+      <p class="empty-desc">换个关键词试试吧</p>
     </div>
 
     <!-- 用户列表 -->
@@ -115,17 +113,13 @@ const handleFollow = async (user: UserItem) => {
 }
 
 // 监听搜索关键词
-watch(
-  () => props.searchKeyword,
-  newKeyword => {
-    if (newKeyword) {
-      searchUsers(newKeyword, true)
-    } else {
-      userList.value = []
-    }
-  },
-  { immediate: true }
-)
+watch(() => props.searchKeyword, (newKeyword) => {
+  if (newKeyword) {
+    searchUsers(newKeyword, true)
+  } else {
+    userList.value = []
+  }
+}, { immediate: true })
 </script>
 
 <style scoped>
@@ -133,7 +127,6 @@ watch(
 .search-results-wrapper {
   background: white;
   min-height: 416px;
-  padding: 0;
   position: relative;
 }
 

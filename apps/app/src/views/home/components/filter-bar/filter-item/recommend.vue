@@ -5,7 +5,7 @@
       <!-- 左列 -->
       <div class="waterfall-column">
         <div v-for="item in leftList" :key="item.id" class="waterfall-card">
-          <div class="card-image">
+          <div class="card-image" @click="goToPictureDetail(item)">
             <img :src="item.image" :alt="item.title" loading="lazy" />
           </div>
           <div class="card-content">
@@ -31,7 +31,7 @@
       <!-- 右列 -->
       <div class="waterfall-column">
         <div v-for="item in rightList" :key="item.id" class="waterfall-card">
-          <div class="card-image">
+          <div class="card-image" @click="goToPictureDetail(item)">
             <img :src="item.image" :alt="item.title" loading="lazy" />
           </div>
           <div class="card-content">
@@ -68,7 +68,7 @@ import { ref, onMounted, onUnmounted, watch } from 'vue'
 import notSelectedIcon from '@/icons/home/like1.png'
 import likeIcon from '@/icons/home/like.png'
 import { fetchMockData } from '@/utils/mockData'
-
+import { useNavigation } from '@/composables/useNavigation'
 // 定义 FeedItem 接口
 interface FeedItem {
   id: number
@@ -81,6 +81,7 @@ interface FeedItem {
   isLiked: boolean
 }
 
+const { goToPictureDetail } = useNavigation()
 const feedList = ref<FeedItem[]>([])
 const leftList = ref<FeedItem[]>([])
 const rightList = ref<FeedItem[]>([])

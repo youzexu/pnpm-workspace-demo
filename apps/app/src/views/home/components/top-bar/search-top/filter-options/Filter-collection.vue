@@ -10,10 +10,8 @@
     <!-- 空状态 -->
     <div v-else-if="searchList.length === 0" class="empty-state">
       <img src="@/icons/home/home-search/image.png" class="empty-image" />
-      <div class="empty-text">
-        <p class="empty-title">这里空空的</p>
-        <p class="empty-desc">换个关键词试试吧</p>
-      </div>
+      <p class="empty-title">这里空空的</p>
+      <p class="empty-desc">换个关键词试试吧</p>
     </div>
 
     <!-- 瀑布流内容 -->
@@ -22,7 +20,7 @@
         <!-- 左列 -->
         <div class="waterfall-column">
           <div v-for="item in leftList" :key="item.id" class="waterfall-card">
-            <div class="card-image">
+            <div class="card-image" @click="goToPictureDetail(item)">
               <img :src="item.image" :alt="item.title" loading="lazy" />
             </div>
             <div class="card-content">
@@ -48,7 +46,7 @@
         <!-- 右列 -->
         <div class="waterfall-column">
           <div v-for="item in rightList" :key="item.id" class="waterfall-card">
-            <div class="card-image">
+            <div class="card-image" @click="goToPictureDetail(item)">
               <img :src="item.image" :alt="item.title" loading="lazy" />
             </div>
             <div class="card-content">
@@ -79,6 +77,7 @@
 import { ref, watch } from 'vue'
 import notSelectedIcon from '@/icons/home/like1.png'
 import likeIcon from '@/icons/home/like.png'
+import { useNavigation } from '@/composables/useNavigation'
 
 interface FeedItem {
   id: number
@@ -99,7 +98,7 @@ const props = defineProps<{
 // 分列数据
 const leftList = ref<FeedItem[]>([])
 const rightList = ref<FeedItem[]>([])
-
+const { goToPictureDetail } = useNavigation()
 // 格式化数字
 const formatNumber = (num: number) => {
   if (num >= 10000) return (num / 10000).toFixed(1) + 'w'
@@ -128,14 +127,8 @@ const distributeToColumns = (items: FeedItem[]) => {
   rightList.value = right
 }
 
-// 监听变化，重新分配
-watch(
-  () => props.searchList,
-  newList => {
-    distributeToColumns(newList)
-  },
-  { immediate: true }
-)
+// 监听数据变化，重新分配
+watch(() => props.searchList, distributeToColumns, { immediate: true })
 </script>
 
 <style scoped>

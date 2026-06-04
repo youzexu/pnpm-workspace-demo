@@ -40,7 +40,7 @@ const loading = ref(false)
 </script>
 
 <style scoped>
-/* 整体容器  */
+/* 整体容器 */
 .search-container {
   display: flex;
   flex-direction: column;
@@ -52,13 +52,13 @@ const loading = ref(false)
   overflow: hidden;
 }
 
-/* 搜索头部 */
-.search-head {
+/* 搜索头部  */
+.search-container > :first-child {
   flex-shrink: 0;
 }
 
 /* 筛选部分  */
-.filter-section {
+.search-container > :nth-child(2) {
   flex-shrink: 0;
   position: sticky;
   top: 0;
@@ -67,7 +67,7 @@ const loading = ref(false)
 }
 
 /* 搜索结果区域  */
-.search-results {
+.search-container > :last-child {
   flex: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
