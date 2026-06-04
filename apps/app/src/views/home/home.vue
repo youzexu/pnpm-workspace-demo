@@ -2,7 +2,7 @@
   <div class="layout-wrapper">
     <!-- 顶部导航栏 -->
     <Navigation class="navigationBar" />
-    
+
     <!-- 滚动容器 -->
     <div class="scroll-container">
       <!-- 筛选框区域 -->
@@ -15,7 +15,7 @@
       <!-- 主内容区域 -->
       <router-view class="router-view" />
     </div>
-    
+
     <!-- 底部栏 -->
     <Bottom class="footerNavigationBar" />
   </div>
@@ -53,11 +53,11 @@ const showTopBarComponent = computed(() => {
   max-width: 375px;
   margin: 0 auto;
   background: white;
+  overflow: hidden;
 }
 
-/* 顶部/底部导航栏 */
-.navigationBar,
-.footerNavigationBar {
+/* 顶部导航栏 */
+.navigationBar {
   flex-shrink: 0;
   width: 100%;
   background: white;
@@ -70,16 +70,25 @@ const showTopBarComponent = computed(() => {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
+  min-height: 0;
 }
 
 .scroll-container::-webkit-scrollbar {
   display: none;
 }
 
+/* 底部导航栏 */
+.footerNavigationBar {
+  flex-shrink: 0;
+  width: 100%;
+  background: white;
+  z-index: 100;
+}
+
 /* 筛选框吸顶效果 */
 .filter-wrapper {
   position: sticky;
-  top: 0;
+  top: -3px;
   z-index: 98;
   background: white;
 }
@@ -87,5 +96,6 @@ const showTopBarComponent = computed(() => {
 /* 路由内容区域 */
 .router-view {
   padding: 8px;
+  display: block;
 }
 </style>

@@ -1,36 +1,70 @@
 <!-- 瀑布流组件 -->
 <template>
   <div class="waterfall-container">
-    <div v-for="item in feedList" :key="item.id" class="waterfall-card">
-      <div class="card-image">
-        <img :src="item.image" :alt="item.title" loading="lazy" />
-      </div>
-      <div class="card-content">
-        <h3 class="card-title">{{ item.title }}</h3>
-        <div class="card-footer">
-          <div class="author-info">
-            <img class="author-avatar" :src="item.author.avatar" />
-            <span class="author-name">{{ item.author.name }}</span>
+    <div class="waterfall-columns">
+      <!-- 左列 -->
+      <div class="waterfall-column">
+        <div v-for="item in leftList" :key="item.id" class="waterfall-card">
+          <div class="card-image">
+            <img :src="item.image" :alt="item.title" loading="lazy" />
           </div>
-          <div class="likes-info">
-            <img
-              class="likes-icon"
-              :src="item.isLiked ? likeIcon : notSelectedIcon"
-              @click="toggleLike(item)"
-            />
-            <span class="likes-count">{{ formatNumber(item.likes) }}</span>
+          <div class="card-content">
+            <h3 class="card-title">{{ item.title }}</h3>
+            <div class="card-footer">
+              <div class="author-info">
+                <img class="author-avatar" :src="item.author.avatar" />
+                <span class="author-name">{{ item.author.name }}</span>
+              </div>
+              <div class="likes-info">
+                <img
+                  class="likes-icon"
+                  :src="item.isLiked ? likeIcon : notSelectedIcon"
+                  @click="toggleLike(item)"
+                />
+                <span class="likes-count">{{ formatNumber(item.likes) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右列 -->
+      <div class="waterfall-column">
+        <div v-for="item in rightList" :key="item.id" class="waterfall-card">
+          <div class="card-image">
+            <img :src="item.image" :alt="item.title" loading="lazy" />
+          </div>
+          <div class="card-content">
+            <h3 class="card-title">{{ item.title }}</h3>
+            <div class="card-footer">
+              <div class="author-info">
+                <img class="author-avatar" :src="item.author.avatar" />
+                <span class="author-name">{{ item.author.name }}</span>
+              </div>
+              <div class="likes-info">
+                <img
+                  class="likes-icon"
+                  :src="item.isLiked ? likeIcon : notSelectedIcon"
+                  @click="toggleLike(item)"
+                />
+                <span class="likes-count">{{ formatNumber(item.likes) }}</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
-    <!-- 加载更多 -->
-    <div v-if="loading" class="loading-more">加载中...</div>
-    <div v-else-if="!hasMore && feedList.length > 0" class="no-more">没有更多了</div>
+
+    <!-- 加载更多容器 -->
+    <div class="load-more-container">
+      <div v-if="loading" class="loading-more">加载中...</div>
+      <div v-else-if="!hasMore && feedList.length > 0" class="no-more">没有更多了</div>
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
 import notSelectedIcon from '@/icons/home/like1.png'
 import likeIcon from '@/icons/home/like.png'
 import { fetchMockData } from '@/utils/mockData'
@@ -48,9 +82,13 @@ interface FeedItem {
 }
 
 const feedList = ref<FeedItem[]>([])
+const leftList = ref<FeedItem[]>([])
+const rightList = ref<FeedItem[]>([])
 const loading = ref(false)
 const page = ref(1)
 const hasMore = ref(true)
+// 防止重复加载
+let isLoadingMore = false
 
 // 格式化数字
 const formatNumber = (num: number) => {
@@ -64,6 +102,22 @@ const toggleLike = (item: FeedItem) => {
   item.isLiked = !item.isLiked
   item.likes += item.isLiked ? 1 : -1
 }
+// 轮流分配数据到两列
+const distributeToColumns = (items: FeedItem[]) => {
+  const left: FeedItem[] = []
+  const right: FeedItem[] = []
+
+  items.forEach((item, index) => {
+    if (index % 2 === 0) {
+      left.push(item)
+    } else {
+      right.push(item)
+    }
+  })
+
+  leftList.value = left
+  rightList.value = right
+}
 
 // 加载数据
 const loadData = async () => {
@@ -71,7 +125,7 @@ const loadData = async () => {
 
   loading.value = true
   try {
-    const res = await fetchMockData(page.value, 50)
+    const res = await fetchMockData(page.value, 10)
     if (res.code === 200) {
       feedList.value = [...feedList.value, ...res.data.list]
       hasMore.value = res.data.hasMore
@@ -81,48 +135,79 @@ const loadData = async () => {
     console.error('加载失败:', error)
   } finally {
     loading.value = false
+    isLoadingMore = false
   }
 }
 
-// 滚动加载更多
+// 滚动加载
 const handleScroll = () => {
-  const scrollTop = document.documentElement.scrollTop || document.body.scrollTop
-  const scrollHeight = document.documentElement.scrollHeight
-  const clientHeight = document.documentElement.clientHeight
-  
-  if (scrollTop + clientHeight >= scrollHeight - 100) {
+  // 防止重复触发
+  if (isLoadingMore || loading.value || !hasMore.value) return
+
+  const scrollContainer = document.querySelector('.scroll-container')
+  if (!scrollContainer) return
+
+  const { scrollTop, scrollHeight, clientHeight } = scrollContainer
+
+  // 距离底部 10px 时触发加载
+  if (scrollTop + clientHeight >= scrollHeight - 10) {
+    isLoadingMore = true
     loadData()
   }
 }
 
+// 监听数据变化，重新分配
+watch(feedList, newList => distributeToColumns(newList), { immediate: true })
+
+// 初始化加载数据
 onMounted(() => {
   loadData()
-  window.addEventListener('scroll', handleScroll)
+  const scrollContainer = document.querySelector('.scroll-container')
+  if (scrollContainer) {
+    scrollContainer.addEventListener('scroll', handleScroll)
+  }
 })
 
+// 监听组件卸载
 onUnmounted(() => {
-  window.removeEventListener('scroll', handleScroll)
+  const scrollContainer = document.querySelector('.scroll-container')
+  if (scrollContainer) {
+    scrollContainer.removeEventListener('scroll', handleScroll)
+  }
 })
 </script>
 
 <style scoped>
 /* 瀑布流容器 */
 .waterfall-container {
-  column-count: 2;
-  column-gap: clamp(6px, 2vw, 8px);
+  display: flex;
+  flex-direction: column;
   padding: clamp(6px, 2vw, 8px);
-  padding-bottom: 80px;
+  padding-bottom: 20px;
 }
 
-/* 瀑布流卡片 */
+/* 两列容器 */
+.waterfall-columns {
+  display: flex;
+  gap: clamp(6px, 2vw, 8px);
+}
+
+/* 每一列 */
+.waterfall-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(6px, 2vw, 8px);
+}
+
+/* 卡片 */
 .waterfall-card {
-  break-inside: avoid;
-  margin-bottom: clamp(6px, 2vw, 8px);
   background: white;
   border-radius: clamp(6px, 2vw, 8px);
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   transition: transform 0.2s ease;
+  width: 100%;
 }
 
 .waterfall-card:active {
@@ -204,32 +289,25 @@ onUnmounted(() => {
   color: #3d3d3d;
 }
 
+/* 加载更多容器 */
+.load-more-container {
+  width: 100%;
+  margin-top: 8px;
+}
+
 /* 加载更多 */
 .loading-more,
 .no-more {
-  column-span: all;
   text-align: center;
   padding: 16px;
   font-size: 12px;
   color: #999;
+  width: 100%;
 }
 
-/* ========== 布局 ========== */
-@media (min-width: 600px) {
-  .waterfall-container {
-    column-count: 3;
-  }
-}
-
-@media (min-width: 900px) {
-  .waterfall-container {
-    column-count: 4;
-  }
-}
-
+/* 大屏幕 */
 @media (min-width: 1200px) {
   .waterfall-container {
-    column-count: 5;
     max-width: 1400px;
     margin: 0 auto;
   }
@@ -237,12 +315,14 @@ onUnmounted(() => {
 
 /* 小屏幕 */
 @media (max-width: 350px) {
-  .waterfall-container {
-    column-gap: 4px;
-    padding: 4px;
+  .waterfall-columns {
+    gap: 4px;
   }
-  .waterfall-card {
-    margin-bottom: 4px;
+  .waterfall-column {
+    gap: 4px;
+  }
+  .waterfall-container {
+    padding: 4px;
   }
 }
 </style>

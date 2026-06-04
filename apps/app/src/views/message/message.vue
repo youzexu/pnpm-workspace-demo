@@ -1,9 +1,14 @@
 <template>
-  <div>
+  <div class="message-page">
     <!-- 消息内容 -->
-    <div class="knowledge-container">
+    <div class="message-container">
       <h1>消息</h1>
+      <div v-for="i in 20" :key="i" class="message-item">
+        消息 {{ i }}
+      </div>
     </div>
+    
+    <!-- 底部栏 -->
     <Bottom />
   </div>
 </template>
@@ -13,8 +18,35 @@ import Bottom from '@/layout/bottom-bar.vue'
 </script>
 
 <style scoped>
-.knowledge-container {
+/* 页面容器 */
+.message-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+  max-width: 375px;
+  margin: 0 auto;
+  background: white;
+}
+
+/* 内容区域 */
+.message-container {
+  flex: 1;
+  overflow-y: auto;
   padding: 20px;
-  margin-bottom: 60px; /* 避免被底部栏遮挡 */
+  padding-bottom: 20px;
+}
+
+/* 底部栏样式 */
+:deep(.footerNavigationBar) {
+  flex-shrink: 0;
+  position: relative;
+}
+
+.message-item {
+  padding: 12px;
+  margin-bottom: 8px;
+  background: #f5f5f5;
+  border-radius: 8px;
 }
 </style>

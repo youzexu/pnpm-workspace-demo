@@ -18,24 +18,55 @@
 
     <!-- 瀑布流内容 -->
     <div v-else class="waterfall-container">
-      <div v-for="item in searchList" :key="item.id" class="waterfall-card">
-        <div class="card-image">
-          <img :src="item.image" :alt="item.title" loading="lazy" />
-        </div>
-        <div class="card-content">
-          <h3 class="card-title">{{ item.title }}</h3>
-          <div class="card-footer">
-            <div class="author-info">
-              <img class="author-avatar" :src="item.author.avatar" />
-              <span class="author-name">{{ item.author.name }}</span>
+      <div class="waterfall-columns">
+        <!-- 左列 -->
+        <div class="waterfall-column">
+          <div v-for="item in leftList" :key="item.id" class="waterfall-card">
+            <div class="card-image">
+              <img :src="item.image" :alt="item.title" loading="lazy" />
             </div>
-            <div class="likes-info">
-              <img
-                class="likes-icon"
-                :src="item.isLiked ? likeIcon : notSelectedIcon"
-                @click="toggleLike(item)"
-              />
-              <span class="likes-count">{{ formatNumber(item.likes) }}</span>
+            <div class="card-content">
+              <h3 class="card-title">{{ item.title }}</h3>
+              <div class="card-footer">
+                <div class="author-info">
+                  <img class="author-avatar" :src="item.author.avatar" />
+                  <span class="author-name">{{ item.author.name }}</span>
+                </div>
+                <div class="likes-info">
+                  <img
+                    class="likes-icon"
+                    :src="item.isLiked ? likeIcon : notSelectedIcon"
+                    @click="toggleLike(item)"
+                  />
+                  <span class="likes-count">{{ formatNumber(item.likes) }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 右列 -->
+        <div class="waterfall-column">
+          <div v-for="item in rightList" :key="item.id" class="waterfall-card">
+            <div class="card-image">
+              <img :src="item.image" :alt="item.title" loading="lazy" />
+            </div>
+            <div class="card-content">
+              <h3 class="card-title">{{ item.title }}</h3>
+              <div class="card-footer">
+                <div class="author-info">
+                  <img class="author-avatar" :src="item.author.avatar" />
+                  <span class="author-name">{{ item.author.name }}</span>
+                </div>
+                <div class="likes-info">
+                  <img
+                    class="likes-icon"
+                    :src="item.isLiked ? likeIcon : notSelectedIcon"
+                    @click="toggleLike(item)"
+                  />
+                  <span class="likes-count">{{ formatNumber(item.likes) }}</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -45,6 +76,7 @@
 </template>
 
 <script lang="ts" setup>
+import { ref, watch } from 'vue'
 import notSelectedIcon from '@/icons/home/like1.png'
 import likeIcon from '@/icons/home/like.png'
 
@@ -59,10 +91,14 @@ interface FeedItem {
   isLiked: boolean
 }
 
-defineProps<{
+const props = defineProps<{
   loading: boolean
   searchList: FeedItem[]
 }>()
+
+// 分列数据
+const leftList = ref<FeedItem[]>([])
+const rightList = ref<FeedItem[]>([])
 
 // 格式化数字
 const formatNumber = (num: number) => {
@@ -75,6 +111,31 @@ const toggleLike = (item: FeedItem) => {
   item.isLiked = !item.isLiked
   item.likes += item.isLiked ? 1 : -1
 }
+// 轮流分配数据到两列
+const distributeToColumns = (items: FeedItem[]) => {
+  const left: FeedItem[] = []
+  const right: FeedItem[] = []
+
+  items.forEach((item, index) => {
+    if (index % 2 === 0) {
+      left.push(item)
+    } else {
+      right.push(item)
+    }
+  })
+
+  leftList.value = left
+  rightList.value = right
+}
+
+// 监听变化，重新分配
+watch(
+  () => props.searchList,
+  newList => {
+    distributeToColumns(newList)
+  },
+  { immediate: true }
+)
 </script>
 
 <style scoped>
@@ -146,19 +207,33 @@ const toggleLike = (item: FeedItem) => {
 
 /* ========== 瀑布流布局 ========== */
 .waterfall-container {
-  column-count: 2;
-  column-gap: clamp(6px, 2vw, 8px);
   padding: clamp(6px, 2vw, 8px);
+}
+
+.waterfall-columns {
+  display: flex;
+  gap: clamp(6px, 2vw, 8px);
+}
+
+.waterfall-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(6px, 2vw, 8px);
 }
 
 /* 瀑布流卡片 */
 .waterfall-card {
-  break-inside: avoid;
-  margin-bottom: clamp(6px, 2vw, 8px);
   background: white;
   border-radius: clamp(6px, 2vw, 8px);
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s ease;
+  width: 100%;
+}
+
+.waterfall-card:active {
+  transform: scale(0.98);
 }
 
 /* 图片区域 */
@@ -205,6 +280,7 @@ const toggleLike = (item: FeedItem) => {
   width: clamp(16px, 4.5vw, 20px);
   height: clamp(16px, 4.5vw, 20px);
   border-radius: 50%;
+  object-fit: cover;
 }
 
 .author-name {
@@ -235,27 +311,16 @@ const toggleLike = (item: FeedItem) => {
   color: #999;
 }
 
-/* ========== 屏幕适配 ========== */
-@media (min-width: 600px) {
-  .waterfall-container {
-    column-count: 3;
-  }
-}
-
-@media (min-width: 900px) {
-  .waterfall-container {
-    column-count: 4;
-  }
-}
-
 /* 小屏幕适配 */
 @media (max-width: 350px) {
-  .waterfall-container {
-    column-gap: 4px;
-    padding: 4px;
+  .waterfall-columns {
+    gap: 4px;
   }
-  .waterfall-card {
-    margin-bottom: 4px;
+  .waterfall-column {
+    gap: 4px;
+  }
+  .waterfall-container {
+    padding: 4px;
   }
 }
 </style>

@@ -15,7 +15,7 @@
         {{ item.label }}
       </span>
     </div>
-    <!-- 首页发布按钮 -->
+    <!-- 发布按钮 -->
     <Publish :isOpen="isPublishOpen" @close="closePublish" />
   </div>
 </template>
@@ -104,10 +104,8 @@ const handleNavClick = (item: NaviBar) => {
     isPublishOpen.value = true
   } else {
     if (item.label === '首页') router.push('/home')
-    else if (item.label === '知识库') {
-      router.push('/knowledge')
-      console.log('知识库')
-    } else if (item.label === '消息') router.push('/message')
+    else if (item.label === '知识库') router.push('/knowledge')
+    else if (item.label === '消息') router.push('/message')
     else if (item.label === '我的') router.push('/mine')
   }
 }
@@ -117,35 +115,47 @@ const closePublish = () => {
 }
 </script>
 <style scoped>
-/* 底部导航栏样式 */
+/* 底部导航栏样式*/
 .footerNavigationBar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  width: 375px;
+  position: relative;
+  width: 100%;
   height: 48px;
   background: #ffffff;
-  box-shadow: 0px 0px 16px 0px rgba(0, 0, 0, 0.1);
-  margin: 0 auto;
+  box-shadow: 0px -2px 10px 0px rgba(0, 0, 0, 0.05);
   z-index: 100;
   display: flex;
   justify-content: space-around;
   align-items: center;
 }
 
+/* 导航项容器 */
 .nav-item {
-  /* 导航项容器  */
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  flex: 1;
+  height: 100%;
 }
 
+/* 图标容器 */
+.icon-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 导航图标 */
+.nav-icon {
+  width: 24px;
+  height: 24px;
+}
+
+/* 文字样式 */
 .nav-label {
-  /* 文字样式 */
   font-size: 10px;
   font-family: PingFang SC;
   font-weight: 600;
@@ -156,14 +166,11 @@ const closePublish = () => {
   margin-top: 2px;
 }
 
+/* 选中状态文字样式 */
 .nav-label.active {
-  /* 选中状态文字样式 */
   color: #262e29;
 }
-.nav-icon {
-  width: 24px;
-  height: 24px;
-}
+
 /* 发布按钮样式 */
 .nav-icon.publish-icon {
   width: 48px;
@@ -172,24 +179,20 @@ const closePublish = () => {
   background: linear-gradient(53deg, #1f2622 0%, #314037 99%);
 }
 
-.nav-icon.publish-icon.active {
-  background: linear-gradient(53deg, #37d081 0%, #2db872 99%);
-}
-/* 图标容器 */
-.icon-wrapper {
-  position: relative;
-  display: inline-block;
-}
+/* 角标 */
 .video-badge {
   position: absolute;
-  top: -3px;
+  top: -6px;
   right: -12px;
   width: 20px;
   height: 11px;
   border-radius: 4px;
 }
-.nav-icon {
-  width: 24px;
-  height: 24px;
+
+/* 响应式适配 */
+@media (max-width: 375px) {
+  .footerNavigationBar {
+    max-width: 100%;
+  }
 }
 </style>
