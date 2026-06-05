@@ -12,15 +12,13 @@
       <p class="empty-title">这里空空的</p>
       <p class="empty-desc">换个关键词试试吧</p>
     </div>
-
     <!-- 用户列表 -->
     <div v-else class="user-container">
       <div v-for="user in userList" :key="user.id" class="user-card">
-        <div class="user-avatar">
+        <div class="user-avatar" @click="goToUserDetail(user)">
           <img :src="user.avatar" :alt="user.name" />
         </div>
-
-        <div class="user-info">
+        <div class="user-info" @click="goToUserDetail(user)">
           <div class="user-name">{{ user.name }}</div>
           <div class="user-bio">{{ user.bio || '这个人很懒，什么都没写~' }}</div>
           <div class="user-stats">
@@ -28,14 +26,13 @@
             <span class="stat-item">藏品：{{ user.collectionsCount }}</span>
           </div>
         </div>
-
         <button
           class="follow-btn"
           :class="{
             followed: user.isFollowed && user.followStatus !== '互相关注',
             mutual: user.followStatus === '互相关注'
           }"
-          @click="handleFollow(user)"
+          @click.stop="handleFollow(user)"
         >
           {{ user.followStatus }}
         </button>
@@ -46,18 +43,11 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { searchUserData, followUser } from '@/utils/mockUser'
+import { searchUserData, followUser } from '@/utils/mockData'
+import { useNavigation } from '@/composables/useNavigation'
 
-interface UserItem {
-  id: number
-  name: string
-  avatar: string
-  bio: string
-  isFollowed: boolean
-  followStatus: '关注' | '已关注' | '互相关注'
-  notesCount: number
-  collectionsCount: number
-}
+// 导入类型
+import type { UserItem } from '@/utils/mockData'
 
 const props = defineProps<{
   searchList?: UserItem[]
@@ -70,6 +60,7 @@ const isLoading = ref(false)
 const page = ref(1)
 const hasMore = ref(true)
 const pageSize = 10
+const { goToUserDetail } = useNavigation()
 
 // 搜索用户
 const searchUsers = async (keyword: string, reset: boolean = true) => {
@@ -113,15 +104,18 @@ const handleFollow = async (user: UserItem) => {
 }
 
 // 监听搜索关键词
-watch(() => props.searchKeyword, (newKeyword) => {
-  if (newKeyword) {
-    searchUsers(newKeyword, true)
-  } else {
-    userList.value = []
-  }
-}, { immediate: true })
+watch(
+  () => props.searchKeyword,
+  newKeyword => {
+    if (newKeyword) {
+      searchUsers(newKeyword, true)
+    } else {
+      userList.value = []
+    }
+  },
+  { immediate: true }
+)
 </script>
-
 <style scoped>
 /* 整体容器 */
 .search-results-wrapper {
@@ -150,7 +144,9 @@ watch(() => props.searchKeyword, (newKeyword) => {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .loading-state p {
@@ -191,15 +187,15 @@ watch(() => props.searchKeyword, (newKeyword) => {
 .user-container {
   padding: 8px;
   overflow-y: auto;
-  max-height: calc(100vh - 120px); 
-  scrollbar-width: thin; 
+  max-height: calc(100vh - 120px);
+  scrollbar-width: thin;
 }
 
 .user-container::-webkit-scrollbar {
   display: none;
 }
 
-/* 用户卡片 - Flex 布局 */
+/* 用户卡片  */
 .user-card {
   display: flex;
   align-items: center;

@@ -20,8 +20,20 @@
   <!-- 密码模式 -->
   <template v-else-if="loginMode === 'password'">
     <form class="phone-login-form" @submit.prevent="handleSubmit">
-      <input type="tel" placeholder="手机号" :value="phone" @input="handlePhoneInput" />
-      <input type="password" placeholder="密码" :value="password" @input="handlePasswordInput" />
+      <input
+        type="tel"
+        placeholder="手机号"
+        :value="phone"
+        @input="handlePhoneInput"
+        autocomplete="tel"
+      />
+      <input
+        type="password"
+        placeholder="密码"
+        :value="password"
+        @input="handlePasswordInput"
+        autocomplete="current-password"
+      />
       <button class="login-btn phone-pwd-login" type="submit">登录</button>
     </form>
   </template>
@@ -41,7 +53,9 @@ const emit = defineEmits([
   'passwordLogin',
   'phoneLogin',
   'update:phone',
-  'update:password'
+  'update:password',
+  'appleLogin',
+  'showBindDialog'
 ])
 
 const handlePhoneInput = (e: Event) => {

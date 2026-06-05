@@ -11,7 +11,7 @@
           <div class="card-content">
             <h3 class="card-title">{{ item.title }}</h3>
             <div class="card-footer">
-              <div class="author-info">
+              <div class="author-info" @click="goToUserDetail(item.author)">
                 <img class="author-avatar" :src="item.author.avatar" />
                 <span class="author-name">{{ item.author.name }}</span>
               </div>
@@ -37,7 +37,7 @@
           <div class="card-content">
             <h3 class="card-title">{{ item.title }}</h3>
             <div class="card-footer">
-              <div class="author-info">
+              <div class="author-info" @click="goToUserDetail(item.author)">
                 <img class="author-avatar" :src="item.author.avatar" />
                 <span class="author-name">{{ item.author.name }}</span>
               </div>
@@ -67,21 +67,13 @@
 import { ref, onMounted, onUnmounted, watch } from 'vue'
 import notSelectedIcon from '@/icons/home/like1.png'
 import likeIcon from '@/icons/home/like.png'
-import { fetchMockData } from '@/utils/mockData'
+import { fetchMockData,FeedItem } from '@/utils/mockData'
 import { useNavigation } from '@/composables/useNavigation'
-// 定义 FeedItem 接口
-interface FeedItem {
-  id: number
-  image: string
-  title: string
-  author: { id: number; name: string; avatar: string }
-  likes: number
-  collections: number
-  growthRecords: number
-  isLiked: boolean
-}
+import { useUserStore } from '@/stores/user'
 
-const { goToPictureDetail } = useNavigation()
+
+const { goToPictureDetail, goToUserDetail } = useNavigation()
+const userStore = useUserStore()
 const feedList = ref<FeedItem[]>([])
 const leftList = ref<FeedItem[]>([])
 const rightList = ref<FeedItem[]>([])
@@ -91,6 +83,19 @@ const hasMore = ref(true)
 // 防止重复加载
 let isLoadingMore = false
 
+
+// 同步用户关注状态到列表
+const syncFollowStatus = () => {
+  const updateList = (list: FeedItem[]) => {
+    list.forEach(item => {
+      const cached = userStore.getFollowStatus(item.author.id)
+      item.author.isFollowed = cached.isFollowed
+      item.author.followStatus = cached.followStatus
+    })
+  }
+  updateList(leftList.value)
+  updateList(rightList.value)
+}
 // 格式化数字
 const formatNumber = (num: number) => {
   if (num >= 10000) return (num / 10000).toFixed(1) + 'w'
@@ -115,9 +120,10 @@ const distributeToColumns = (items: FeedItem[]) => {
       right.push(item)
     }
   })
-
   leftList.value = left
   rightList.value = right
+  // 同步用户关注状态到列表
+  syncFollowStatus()
 }
 
 // 加载数据
@@ -128,6 +134,14 @@ const loadData = async () => {
   try {
     const res = await fetchMockData(page.value, 10)
     if (res.code === 200) {
+      // 批量初始化关注状态
+      const users = res.data.list.map(item => ({
+        id: item.author.id,
+        isFollowed: item.author.isFollowed,
+        followStatus: item.author.followStatus
+      }))
+      userStore.initFollowStatus(users)
+      
       feedList.value = [...feedList.value, ...res.data.list]
       hasMore.value = res.data.hasMore
       page.value++

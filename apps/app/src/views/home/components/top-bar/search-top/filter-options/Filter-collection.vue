@@ -78,17 +78,8 @@ import { ref, watch } from 'vue'
 import notSelectedIcon from '@/icons/home/like1.png'
 import likeIcon from '@/icons/home/like.png'
 import { useNavigation } from '@/composables/useNavigation'
+import type { FeedItem } from '@/utils/mockData'
 
-interface FeedItem {
-  id: number
-  image: string
-  title: string
-  author: { id: number; name: string; avatar: string }
-  likes: number
-  collections: number
-  growthRecords: number
-  isLiked: boolean
-}
 
 const props = defineProps<{
   loading: boolean

@@ -140,9 +140,15 @@ const router = createRouter({
     },
     //图片详细路由
     {
-      path: '/picture/:id', // 添加 :id 动态参数
+      path: '/picture/:id', //:id 动态参数
       name: 'Picture',
       component: () => import('../views/detail/picture-details.vue')
+    },
+    // 用户详细路由
+    {
+      path: '/user/:id',
+      name: 'User',
+      component: () => import('../views/detail/user-details.vue')
     }
   ]
 })

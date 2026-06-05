@@ -1,16 +1,27 @@
-// 类型定义
-export interface Author {
+// ==================== 类型定义 ====================
+
+// 关注状态类型
+export type FollowStatus = '关注' | '已关注' | '互相关注'
+
+// 用户数据接口
+export interface UserItem {
   id: number
   name: string
   avatar: string
+  bio: string
+  isFollowed: boolean
+  followStatus: FollowStatus
+  notesCount: number // 笔记/作品数
+  collectionsCount: number // 被收藏数
 }
 
+// 瀑布流内容接口
 export interface FeedItem {
   id: number
   image: string
   title: string
-  description: string // 新增：长简介
-  author: Author
+  description: string
+  author: UserItem
   likes: number
   comments: number
   collections: number
@@ -21,6 +32,7 @@ export interface FeedItem {
   height: number
 }
 
+// 分页结果接口
 export interface PageResult {
   code: number
   message: string
@@ -33,12 +45,27 @@ export interface PageResult {
   }
 }
 
-// 配置
+// 用户分页结果接口
+export interface UserPageResult {
+  code: number
+  message: string
+  data: {
+    list: UserItem[]
+    total: number
+    page: number
+    pageSize: number
+    hasMore: boolean
+  }
+}
+
+// ==================== 配置 ====================
+
 const IMAGE_CONFIG = {
   width: 176,
-  height: [200, 250, 225, 275] as number[],
-  categories: ['nature', 'tech', 'people', 'animals', 'art']
+  height: [200, 250, 225, 275] as number[]
 }
+
+// ==================== 内容数据池 ====================
 
 const TITLES: string[] = [
   '五针松生长记录',
@@ -55,7 +82,6 @@ const TITLES: string[] = [
   '兰花鉴赏'
 ]
 
-// 新增：长简介库
 const DESCRIPTIONS: string[] = [
   '五针松是盆景中的经典品种，树姿优美，针叶翠绿。养护时需要注意控制浇水，避免积水烂根。春季可适当施肥，促进生长。修剪时要保持层次感，展现自然之美。',
   '盆景造型讲究"虽由人作，宛自天开"。通过修剪、蟠扎等技法，将自然景观浓缩于方寸之间。每一盆盆景都是独特的艺术品，需要耐心和时间的打磨。',
@@ -71,13 +97,62 @@ const DESCRIPTIONS: string[] = [
   '盆景需要定期换盆，一般每隔2-3年换一次。换盆时要去除部分旧土，修剪腐烂根系，添加新的培养土。换盆后要放在阴凉处缓苗一周左右。'
 ]
 
-const AVATARS: string[] = [
+// ==================== 用户数据池 ====================
+
+const USER_AVATARS: string[] = [
   'https://randomuser.me/api/portraits/men/1.jpg',
   'https://randomuser.me/api/portraits/women/2.jpg',
-  'https://randomuser.me/api/portraits/men/3.jpg'
+  'https://randomuser.me/api/portraits/men/3.jpg',
+  'https://randomuser.me/api/portraits/women/4.jpg',
+  'https://randomuser.me/api/portraits/men/5.jpg',
+  'https://randomuser.me/api/portraits/women/6.jpg',
+  'https://randomuser.me/api/portraits/men/7.jpg',
+  'https://randomuser.me/api/portraits/women/8.jpg',
+  'https://randomuser.me/api/portraits/men/9.jpg',
+  'https://randomuser.me/api/portraits/women/10.jpg'
 ]
 
-// 工具函数
+const USER_NAMES: string[] = [
+  '园艺小达人',
+  '盆景大师',
+  '多肉控',
+  '兰花仙子',
+  '绿植爱好者',
+  '庭院设计师',
+  '植物医生',
+  '花艺师',
+  '盆栽玩家',
+  '自然摄影师',
+  'YAYA1245',
+  '九哥无敌',
+  '知芽君',
+  '绿手指',
+  '花间集',
+  '植觉',
+  '园丁日记',
+  '草木有心',
+  '花花世界',
+  '植物星球'
+]
+
+const USER_BIOS: string[] = [
+  '热爱植物，分享生活',
+  '盆景爱好者，欢迎交流',
+  '多肉植物养护达人',
+  '兰花收藏家',
+  '庭院设计分享',
+  '植物病虫害防治专家',
+  '室内绿植推荐官',
+  '花园改造日记',
+  '这个人很懒，没有留下任何东西',
+  '资深园艺师，从业10年',
+  '植物科普博主',
+  '🌿 与植物为伴',
+  '记录每一棵植物的成长'
+]
+
+// ==================== 工具函数 ====================
+
 const random = (min: number, max: number): number => {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
@@ -86,19 +161,44 @@ const randomItem = <T>(arr: T[]): T => {
   return arr[Math.floor(Math.random() * arr.length)]
 }
 
-// 生成单条模拟数据
+// ==================== 用户数据生成 ====================
+
+// 生成单条用户数据
+export const generateMockUser = (id: number): UserItem => {
+  const isFollowed = Math.random() > 0.6
+  return {
+    id,
+    name: randomItem(USER_NAMES),
+    avatar: randomItem(USER_AVATARS),
+    bio: randomItem(USER_BIOS),
+    isFollowed: isFollowed,
+    followStatus: isFollowed ? randomItem(['已关注', '互相关注']) : '关注',
+    notesCount: random(1, 50),
+    collectionsCount: random(0, 5000)
+  }
+}
+
+// 批量生成用户数据
+export const generateMockUsers = (count: number, startId: number = 1): UserItem[] => {
+  return Array.from({ length: count }, (_, i) => generateMockUser(startId + i))
+}
+
+// 用户数据池
+export const USERS: UserItem[] = generateMockUsers(100, 1)
+
+// ==================== 瀑布流内容数据生成 ====================
+
+// 生成单条内容数据（使用用户池中的作者）
 export const generateMockItem = (id: number): FeedItem => {
   const height = randomItem(IMAGE_CONFIG.height)
+  const randomUser = randomItem(USERS)
+
   return {
     id,
     image: `https://picsum.photos/${IMAGE_CONFIG.width}/${height}?random=${id}`,
     title: randomItem(TITLES),
-    description: randomItem(DESCRIPTIONS), // 新增：随机选择长简介
-    author: {
-      id: random(1, 100),
-      name: `用户${random(1000, 9999)}`,
-      avatar: randomItem(AVATARS)
-    },
+    description: randomItem(DESCRIPTIONS),
+    author: { ...randomUser }, // 展开所有属性
     likes: random(100, 50000),
     comments: random(10, 500),
     collections: random(50, 5000),
@@ -110,12 +210,14 @@ export const generateMockItem = (id: number): FeedItem => {
   }
 }
 
-// 批量生成
+// 批量生成内容数据
 export const generateMockList = (count: number, startId: number = 1): FeedItem[] => {
   return Array.from({ length: count }, (_, i) => generateMockItem(startId + i))
 }
 
-// 分页获取（模拟 API）
+// ==================== API 函数 ====================
+
+// 分页获取瀑布流数据
 export const fetchMockData = async (
   page: number,
   pageSize: number = 10,
@@ -139,7 +241,7 @@ export const fetchMockData = async (
   }
 }
 
-// 根据关键词搜索内容
+// 搜索内容
 export const searchMockData = async (
   keyword: string,
   page: number = 1,
@@ -148,7 +250,6 @@ export const searchMockData = async (
 ): Promise<PageResult> => {
   await new Promise(resolve => setTimeout(resolve, delay))
 
-  // 模拟搜索：筛选包含关键词的标题或简介
   const filteredItems = TITLES.filter(
     (title, index) =>
       title.toLowerCase().includes(keyword.toLowerCase()) ||
@@ -169,7 +270,6 @@ export const searchMockData = async (
     }
   }
 
-  // 生成搜索结果
   const startId = (page - 1) * pageSize + 1
   const startIndex = (page - 1) * pageSize
   const endIndex = startIndex + pageSize
@@ -177,16 +277,13 @@ export const searchMockData = async (
 
   const list = pageTitles.map((title, index) => {
     const descIndex = TITLES.findIndex(t => t === title)
+    const randomUser = randomItem(USERS)
     return {
       id: startId + index,
       image: `https://picsum.photos/${IMAGE_CONFIG.width}/${randomItem(IMAGE_CONFIG.height)}?random=${startId + index}`,
       title: title,
       description: DESCRIPTIONS[descIndex >= 0 ? descIndex : random(0, DESCRIPTIONS.length - 1)],
-      author: {
-        id: random(1, 100),
-        name: `用户${random(1000, 9999)}`,
-        avatar: randomItem(AVATARS)
-      },
+      author: { ...randomUser },
       likes: random(100, 50000),
       comments: random(10, 500),
       collections: random(50, 5000),
@@ -209,4 +306,106 @@ export const searchMockData = async (
       hasMore: page * pageSize < filteredItems.length
     }
   }
+}
+// 搜索用户
+export const searchUserData = async (
+  keyword: string,
+  page: number = 1,
+  pageSize: number = 10,
+  delay: number = 300
+): Promise<UserPageResult> => {
+  await new Promise(resolve => setTimeout(resolve, delay))
+
+  const filteredUsers = USERS.filter(
+    user =>
+      user.name.toLowerCase().includes(keyword.toLowerCase()) ||
+      user.bio.toLowerCase().includes(keyword.toLowerCase())
+  )
+
+  if (filteredUsers.length === 0 && keyword) {
+    return {
+      code: 200,
+      message: 'success',
+      data: {
+        list: [],
+        total: 0,
+        page,
+        pageSize,
+        hasMore: false
+      }
+    }
+  }
+
+  if (keyword) {
+    filteredUsers.sort((a, b) => {
+      const aMatch = a.name.toLowerCase().includes(keyword.toLowerCase()) ? 2 : 1
+      const bMatch = b.name.toLowerCase().includes(keyword.toLowerCase()) ? 2 : 1
+      return bMatch - aMatch
+    })
+  }
+
+  const startIndex = (page - 1) * pageSize
+  const endIndex = startIndex + pageSize
+  const pageUsers = filteredUsers.slice(startIndex, endIndex)
+
+  return {
+    code: 200,
+    message: 'success',
+    data: {
+      list: pageUsers,
+      total: filteredUsers.length,
+      page,
+      pageSize,
+      hasMore: page * pageSize < filteredUsers.length
+    }
+  }
+}
+
+// 关注/取消关注
+export const followUser = async (
+  userId: number
+): Promise<{
+  code: number
+  message: string
+  data: {
+    isFollowed: boolean
+    followStatus: FollowStatus
+  }
+}> => {
+  await new Promise(resolve => setTimeout(resolve, 300))
+
+  const user = USERS.find(u => u.id === userId)
+  if (!user) {
+    return {
+      code: 404,
+      message: '用户不存在',
+      data: { isFollowed: false, followStatus: '关注' }
+    }
+  }
+
+  const newIsFollowed = !user.isFollowed
+  let newFollowStatus: FollowStatus = '关注'
+
+  if (newIsFollowed) {
+    newFollowStatus = Math.random() > 0.7 ? '互相关注' : '已关注'
+  }
+
+  user.isFollowed = newIsFollowed
+  user.followStatus = newFollowStatus
+
+  return {
+    code: 200,
+    message: 'success',
+    data: {
+      isFollowed: newIsFollowed,
+      followStatus: newFollowStatus
+    }
+  }
+}
+
+// ==================== 转换函数 ====================
+
+// 根据用户ID获取用户信息
+export const getUserById = (userId: number): UserItem | undefined => {
+  return USERS.find(user => user.id === userId)
 }

@@ -4,7 +4,7 @@
     <div class="user-header">
       <img class="back-icon" src="@/icons/user-details/back.png" @click="goBack" />
       <div class="user-info">
-        <div class="user-left">
+        <div class="user-left" @click="goToUserDetail(userData)">
           <img class="user-avatar" :src="userData.avatar" alt="头像" />
           <span class="user-name">{{ userData.name }}</span>
         </div>
@@ -25,7 +25,13 @@
     <div class="description-area">
       <div class="description-content">
         <h3 class="bio-title">{{ userData.title }}</h3>
-        <p class="bio-text">{{ userData.bio || '这个人很懒，什么都没写~' }}</p>
+        <p class="bio-text">{{ userData.description || '这个人很懒，什么都没写~' }}</p>
+
+        <!-- 时间显示 -->
+        <div class="time-info" v-if="userData.createdAt">
+          <span class="time-label">编辑于:</span>
+          <span class="time-value">{{ userData.createdAt || '时间' }}</span>
+        </div>
       </div>
     </div>
 
@@ -45,7 +51,7 @@
         <!-- 点赞 -->
         <div class="action-item">
           <img class="action-icon" :src="isLiked ? likeActiveIcon : likeIcon" @click="toggleLike" />
-          <span class="action-count">{{ userData.likes || 0 }}</span>
+          <span class="action-count">{{ formatNumber(userData.likes || 0) }}</span>
         </div>
 
         <!-- 收藏 -->
@@ -55,7 +61,7 @@
             :src="isCollected ? collectActiveIcon : collectIcon"
             @click="toggleCollect"
           />
-          <span class="action-count">{{ userData.collects || 0 }}</span>
+          <span class="action-count">{{ formatNumber(userData.collects || 0) }}</span>
         </div>
       </div>
     </div>
@@ -65,7 +71,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-
+import { useNavigation } from '@/composables/useNavigation'
+import { useUserStore } from '@/stores/user'
 // 收藏图标
 import collectIcon from '@/icons/user-details/collect.png'
 import collectActiveIcon from '@/icons/user-details/collect1.png'
@@ -75,6 +82,7 @@ import likeActiveIcon from '@/icons/user-details/like1.png'
 
 const route = useRoute()
 const router = useRouter()
+const userStore = useUserStore()
 
 const userData = ref({
   id: 0,
@@ -85,13 +93,26 @@ const userData = ref({
   bio: '',
   likes: 0,
   collects: 0,
-  isFollowed: false
+  notesCount: 0,
+  collectionsCount: 0,
+  isFollowed: false,
+  followStatus: '关注' as '关注' | '已关注' | '互相关注',
+  isLiked: false,
+  isCollected: false,
+  description: '',
+  createdAt: ''
 })
 
 const commentText = ref('')
 const isCollected = ref(false)
 const isLiked = ref(false)
-
+const { goToUserDetail } = useNavigation()
+// 格式化数字
+const formatNumber = (num: number) => {
+  if (num >= 10000) return (num / 10000).toFixed(1) + 'w'
+  if (num >= 1000) return (num / 1000).toFixed(1) + 'k'
+  return num.toString()
+}
 // 获取 query 参数
 const getQueryData = () => {
   const data = route.query.data
@@ -101,22 +122,35 @@ const getQueryData = () => {
 // 解析传递的数据
 const initData = () => {
   const dataStr = getQueryData()
-
   if (dataStr) {
     try {
       const item = JSON.parse(decodeURIComponent(dataStr))
       console.log('解析后的数据:', item)
+      
+      // 从 store 获取关注状态
+      const cachedStatus = userStore.getFollowStatus(item.author?.id || item.id)
+      
       userData.value = {
         id: item.author?.id || item.id,
         name: item.author?.name || '用户名',
-        avatar: item.author?.avatar || 'https://picsum.photos/100/100?random=1',
+        avatar: item.author?.avatar || '头像',
+        isFollowed: cachedStatus.isFollowed,
+        followStatus: cachedStatus.followStatus,
+        notesCount: item.author?.notesCount || 0,
+        bio: item.author?.bio || '这个人很懒，什么都没写~',
+        collectionsCount: item.author?.collectionsCount || 0,
         bgImage: item.image,
         title: item.title || '标题',
-        bio: item.description || '这个人很懒，什么都没写~',
         likes: item.likes || 0,
-        collects: item.collects || 0,
-        isFollowed: false
+        collects: item.collections || 0,
+        isLiked: item.isLiked || false,
+        isCollected: item.isCollected || false,
+        description: item.description || '',
+        createdAt: item.createdAt || ''
       }
+      
+      isLiked.value = userData.value.isLiked
+      isCollected.value = userData.value.isCollected
     } catch (error) {
       console.error('解析失败:', error)
     }
@@ -128,23 +162,29 @@ const initData = () => {
 // 返回上一页
 const goBack = () => router.back()
 
+// 切换点赞
+const toggleLike = () => {
+  isLiked.value = !isLiked.value
+  userData.value.isLiked = isLiked.value
+  userData.value.likes = isLiked.value
+    ? userData.value.likes + 1
+    : userData.value.likes - 1
+}
+
 // 切换收藏
 const toggleCollect = () => {
   isCollected.value = !isCollected.value
+  userData.value.isCollected = isCollected.value
   userData.value.collects = isCollected.value
     ? userData.value.collects + 1
     : userData.value.collects - 1
 }
 
-// 切换点赞
-const toggleLike = () => {
-  isLiked.value = !isLiked.value
-  userData.value.likes = isLiked.value ? userData.value.likes + 1 : userData.value.likes - 1
-}
-
 // 切换关注
 const toggleFollow = () => {
-  userData.value.isFollowed = !userData.value.isFollowed
+  const newStatus = userStore.toggleFollow(userData.value.id)
+  userData.value.isFollowed = newStatus.isFollowed
+  userData.value.followStatus = newStatus.followStatus
 }
 
 // 分享
@@ -223,7 +263,7 @@ onMounted(() => {
 
 /* 关注按钮 */
 .follow-btn {
-  width: clamp(36px, 12vw, 40px);
+  width: clamp(36px, 14vw, 40px);
   height: clamp(22px, 7vh, 24px);
   border-radius: 2px;
   border: none;
@@ -240,6 +280,7 @@ onMounted(() => {
 .follow-btn.followed {
   background: rgba(44, 53, 47, 0.1);
   color: rgba(44, 53, 47, 0.4);
+  min-width: 45px;
 }
 
 .share-icon {
@@ -250,6 +291,15 @@ onMounted(() => {
 }
 
 /* ==================== 背景图片样式 ==================== */
+.user-detail-page {
+  position: relative;
+  min-height: 100vh;
+  background: #fff;
+  padding-bottom: 48px;
+  overflow-x: hidden;
+}
+
+/* 背景图片区域  */
 .bg-image-area {
   position: relative;
   width: 100%;
@@ -269,7 +319,6 @@ onMounted(() => {
   background-position: center;
 }
 
-/* 渐变遮罩层 */
 .bg-overlay {
   position: absolute;
   top: 0;
@@ -281,13 +330,12 @@ onMounted(() => {
 
 /* ==================== 个人简介样式 ==================== */
 .description-area {
+  position: relative;
   width: 100%;
   max-width: 375px;
-  margin: 0 auto;
+  margin: -20px auto 0;
   background: #fff;
-  border-radius: 16px 16px 0 0;
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
-  position: relative;
   z-index: 5;
 }
 
@@ -295,8 +343,29 @@ onMounted(() => {
   padding: 20px 16px;
   max-height: 266px;
   overflow-y: auto;
+  background: #fff;
+  border-radius: 16px 16px 0 0;
+}
+/* 时间信息样式 */
+.time-info {
+  margin-top: 16px;
+  padding-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #999;
 }
 
+.time-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.time-value {
+  color: #666;
+}
 /* ==================== 底部操作栏样式 ==================== */
 .bottom-input-container {
   position: fixed;
@@ -326,7 +395,7 @@ onMounted(() => {
   max-width: 260px;
   height: 40px;
   background: #f5f5f5;
-  border-radius: 20px;
+  border-radius: 4px;
 }
 
 /* 左侧图标 */
@@ -362,7 +431,7 @@ onMounted(() => {
 /* 右侧操作按钮组 */
 .action-icons {
   display: flex;
-  gap: 16px;
+  gap: 6px;
   align-items: center;
   flex-shrink: 0;
 }
