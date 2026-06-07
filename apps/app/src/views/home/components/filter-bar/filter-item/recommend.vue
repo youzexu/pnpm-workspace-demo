@@ -64,16 +64,20 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, onUnmounted, watch } from 'vue'
+defineOptions({
+  name: 'Recommend'
+})
+import { ref, onMounted, onUnmounted, watch, onActivated, nextTick } from 'vue'
 import notSelectedIcon from '@/icons/home/like1.png'
 import likeIcon from '@/icons/home/like.png'
 import { fetchMockData,FeedItem } from '@/utils/mockData'
 import { useNavigation } from '@/composables/useNavigation'
 import { useUserStore } from '@/stores/user'
-
+import { useWaterfallStore } from '@/stores/waterfall'
 
 const { goToPictureDetail, goToUserDetail } = useNavigation()
 const userStore = useUserStore()
+const waterfallStore = useWaterfallStore()
 const feedList = ref<FeedItem[]>([])
 const leftList = ref<FeedItem[]>([])
 const rightList = ref<FeedItem[]>([])
@@ -125,6 +129,40 @@ const distributeToColumns = (items: FeedItem[]) => {
   // 同步用户关注状态到列表
   syncFollowStatus()
 }
+// 保存数据到 store
+const saveDataToStore = () => {
+  waterfallStore.saveRecommendData(feedList.value, page.value, hasMore.value)
+}
+
+// 保存滚动位置
+const saveScrollPosition = () => {
+  const container = document.querySelector('.scroll-container')
+  if (container) {
+    waterfallStore.saveRecommendScrollTop(container.scrollTop)
+  }
+}
+
+// 从 store 恢复数据
+const restoreDataFromStore = (): boolean => {
+  if (waterfallStore.recommendData.length > 0) {
+    console.log('从 store 恢复推荐页面数据，数量:', waterfallStore.recommendData.length)
+    feedList.value = waterfallStore.recommendData
+    page.value = waterfallStore.recommendPage
+    hasMore.value = waterfallStore.recommendHasMore
+    return true
+  }
+  return false
+}
+
+// 恢复滚动位置
+const restoreScrollPosition = async () => {
+  await nextTick()
+  const container = document.querySelector('.scroll-container')
+  if (container && waterfallStore.recommendScrollTop > 0) {
+    console.log('恢复滚动位置:', waterfallStore.recommendScrollTop)
+    container.scrollTop = waterfallStore.recommendScrollTop
+  }
+}
 
 // 加载数据
 const loadData = async () => {
@@ -145,6 +183,7 @@ const loadData = async () => {
       feedList.value = [...feedList.value, ...res.data.list]
       hasMore.value = res.data.hasMore
       page.value++
+      saveDataToStore()
     }
   } catch (error) {
     console.error('加载失败:', error)
@@ -159,36 +198,56 @@ const handleScroll = () => {
   // 防止重复触发
   if (isLoadingMore || loading.value || !hasMore.value) return
 
-  const scrollContainer = document.querySelector('.scroll-container')
-  if (!scrollContainer) return
+  const container = document.querySelector('.scroll-container')
+  if (!container) return
 
-  const { scrollTop, scrollHeight, clientHeight } = scrollContainer
-
+  const { scrollTop, scrollHeight, clientHeight } = container
   // 距离底部 10px 时触发加载
   if (scrollTop + clientHeight >= scrollHeight - 10) {
     isLoadingMore = true
     loadData()
+  }
+
+  // 保存滚动位置
+  waterfallStore.saveRecommendScrollTop(scrollTop)
+}
+
+// 绑定滚动事件
+const bindScrollEvent = () => {
+  const container = document.querySelector('.scroll-container')
+  if (container) {
+    container.removeEventListener('scroll', handleScroll)
+    container.addEventListener('scroll', handleScroll)
   }
 }
 
 // 监听数据变化，重新分配
 watch(feedList, newList => distributeToColumns(newList), { immediate: true })
 
-// 初始化加载数据
-onMounted(() => {
-  loadData()
-  const scrollContainer = document.querySelector('.scroll-container')
-  if (scrollContainer) {
-    scrollContainer.addEventListener('scroll', handleScroll)
+// 首次挂载
+onMounted(async () => {
+  // 从 store 恢复数据
+  if (!restoreDataFromStore()) {
+    await loadData()
   }
+  bindScrollEvent()
+  await restoreScrollPosition()
+})
+
+// 从缓存激活时调用
+onActivated(async () => {
+  bindScrollEvent()
+  await restoreScrollPosition()
 })
 
 // 监听组件卸载
 onUnmounted(() => {
-  const scrollContainer = document.querySelector('.scroll-container')
-  if (scrollContainer) {
-    scrollContainer.removeEventListener('scroll', handleScroll)
+  const container = document.querySelector('.scroll-container')
+  if (container) {
+    container.removeEventListener('scroll', handleScroll)
   }
+  saveDataToStore()
+  saveScrollPosition()
 })
 </script>
 

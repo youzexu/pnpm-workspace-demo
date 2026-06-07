@@ -1,17 +1,11 @@
 <template>
   <div class="search-results-wrapper">
     <!-- 加载中 -->
-    <div v-if="loading || isLoading" class="loading-state">
-      <div class="loading-spinner"></div>
-      <p>加载中...</p>
-    </div>
-
+    <common-states v-if="loading || isLoading" type="loading" />
+    
     <!-- 空状态 -->
-    <div v-else-if="userList.length === 0" class="empty-state">
-      <img src="@/icons/home/home-search/image.png" class="empty-image" />
-      <p class="empty-title">这里空空的</p>
-      <p class="empty-desc">换个关键词试试吧</p>
-    </div>
+    <common-states v-else-if="userList.length === 0" type="empty" />
+    
     <!-- 用户列表 -->
     <div v-else class="user-container">
       <div v-for="user in userList" :key="user.id" class="user-card">
@@ -45,6 +39,7 @@
 import { ref, watch } from 'vue'
 import { searchUserData, followUser } from '@/utils/mockData'
 import { useNavigation } from '@/composables/useNavigation'
+import CommonStates from './common-states.vue'
 
 // 导入类型
 import type { UserItem } from '@/utils/mockData'
@@ -122,65 +117,6 @@ watch(
   background: white;
   min-height: 416px;
   position: relative;
-}
-
-/* ========== 加载状态 ========== */
-.loading-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 20px;
-  gap: 16px;
-}
-
-.loading-spinner {
-  width: 36px;
-  height: 36px;
-  border: 3px solid #f0f0f0;
-  border-top-color: #37d081;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.loading-state p {
-  font-size: 16px;
-  font-weight: 500;
-  color: #666;
-}
-
-/* ========== 空状态 ========== */
-.empty-state {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 119px;
-  text-align: center;
-}
-
-.empty-image {
-  width: 100px;
-  height: 100px;
-  margin: 0 auto 24px;
-  display: block;
-}
-
-.empty-title {
-  font-size: 16px;
-  color: #262e29;
-  margin-bottom: 4px;
-}
-
-.empty-desc {
-  font-size: 14px;
-  color: rgba(44, 53, 47, 0.4);
 }
 
 /* ========== 用户列表 ========== */

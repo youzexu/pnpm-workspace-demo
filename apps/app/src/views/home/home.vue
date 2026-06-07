@@ -13,7 +13,11 @@
         </div>
       </template>
       <!-- 主内容区域 -->
-      <router-view class="router-view" />
+      <router-view v-slot="{ Component }">
+        <keep-alive :include="['Recommend']">
+          <component :is="Component" class="router-view" />
+        </keep-alive>
+      </router-view>
     </div>
 
     <!-- 底部栏 -->
