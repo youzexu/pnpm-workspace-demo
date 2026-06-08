@@ -143,8 +143,12 @@ const handleOnelogin = () => {
 
 <style scoped>
 .login-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   width: 100%;
-  min-height: 100vh;
   background: #ffffff;
   display: flex;
   flex-direction: column;
@@ -156,7 +160,7 @@ const handleOnelogin = () => {
 .logo {
   width: clamp(60px, 25vw, 120px);
   height: clamp(60px, 25vw, 120px);
-  margin-top: clamp(40px, 20vh, 156px);
+  margin-top: clamp(40px, 18vh, 200px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -173,11 +177,9 @@ const handleOnelogin = () => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: clamp(20px, 15vh, 120px);
-  gap: clamp(12px, 4vh, 20px);
+  margin-top: clamp(40px, 18vh, 200px);
+  gap: clamp(12px, 3vh, 20px);
   width: min(280px, 85%);
-  flex: 1;
-  justify-content: center;
 }
 
 .agree-terms {
@@ -194,8 +196,8 @@ const handleOnelogin = () => {
   align-items: center;
   gap: clamp(24px, 8vw, 36px);
   width: 100%;
-  margin-top: clamp(20px, 6vh, 40px);
-  margin-bottom: clamp(20px, 6vh, 40px);
+  margin-top: clamp(20px, 4vh, 40px);
+  margin-bottom: clamp(20px, 5vh, 40px);
   flex-shrink: 0;
 }
 
@@ -266,29 +268,32 @@ const handleOnelogin = () => {
 
 /* ========== 小屏幕适配 ========== */
 @media (max-height: 700px) {
+  .logo {
+    margin-top: 100px;
+  }
   .login {
-    justify-content: flex-start;
-    padding: 15px 0;
+    margin-top: 150px;  
+    gap: 12px;
   }
   .social-media {
-    margin-top: 15px;
+    margin-top: 12px;
     margin-bottom: 20px;
   }
 }
 
 @media (max-height: 600px) {
   .logo {
-    margin-top: 15px;
-    width: 70px;
-    height: 70px;
+    margin-top: 10px;
+    width: 60px;
+    height: 60px;
   }
   .login {
+    margin-top: 20px;
     gap: 8px;
-    padding: 10px 0;
   }
   .social-media {
     gap: 20px;
-    margin-top: 10px;
+    margin-top: 8px;
     margin-bottom: 15px;
   }
 }
@@ -304,16 +309,16 @@ const handleOnelogin = () => {
 
 @media (orientation: landscape) and (max-height: 450px) {
   .logo {
-    margin-top: 10px;
-    width: 50px;
-    height: 50px;
+    margin-top: 5px;
+    width: 45px;
+    height: 45px;
   }
   .login {
+    margin-top: 10px;
     gap: 6px;
-    padding: 8px 0;
   }
   .social-media {
-    margin-top: 8px;
+    margin-top: 5px;
     margin-bottom: 10px;
   }
 }

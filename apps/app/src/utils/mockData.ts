@@ -29,7 +29,9 @@ export interface FeedItem {
   isLiked: boolean
   isCollected: boolean
   createdAt: string
-  height: number
+  height: number // 图片高度
+  width: number // 图片宽度
+  imageRatio: number // 宽高比
 }
 
 // 分页结果接口
@@ -63,6 +65,11 @@ export interface UserPageResult {
 const IMAGE_CONFIG = {
   width: 176,
   height: [200, 250, 225, 275] as number[]
+}
+
+// 根据高度计算宽高比 
+const getImageRatio = (height: number): number => {
+  return IMAGE_CONFIG.width / height
 }
 
 // ==================== 内容数据池 ====================
@@ -206,7 +213,9 @@ export const generateMockItem = (id: number): FeedItem => {
     isLiked: false,
     isCollected: false,
     createdAt: new Date(Date.now() - random(0, 30) * 24 * 60 * 60 * 1000).toISOString(),
-    height
+    height: height,
+    width: IMAGE_CONFIG.width,
+    imageRatio: getImageRatio(height) // 计算宽高比
   }
 }
 
@@ -278,9 +287,10 @@ export const searchMockData = async (
   const list = pageTitles.map((title, index) => {
     const descIndex = TITLES.findIndex(t => t === title)
     const randomUser = randomItem(USERS)
+    const height = randomItem(IMAGE_CONFIG.height)
     return {
       id: startId + index,
-      image: `https://picsum.photos/${IMAGE_CONFIG.width}/${randomItem(IMAGE_CONFIG.height)}?random=${startId + index}`,
+      image: `https://picsum.photos/${IMAGE_CONFIG.width}/${height}?random=${startId + index}`,
       title: title,
       description: DESCRIPTIONS[descIndex >= 0 ? descIndex : random(0, DESCRIPTIONS.length - 1)],
       author: { ...randomUser },
@@ -291,7 +301,9 @@ export const searchMockData = async (
       isLiked: false,
       isCollected: false,
       createdAt: new Date(Date.now() - random(0, 30) * 24 * 60 * 60 * 1000).toISOString(),
-      height: randomItem(IMAGE_CONFIG.height)
+      height: height,
+      width: IMAGE_CONFIG.width,
+      imageRatio: getImageRatio(height)
     }
   })
 

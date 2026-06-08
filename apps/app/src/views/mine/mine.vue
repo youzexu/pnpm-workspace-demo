@@ -18,15 +18,20 @@ import Bottom from '@/layout/bottom-bar.vue'
 </script>
 
 <style scoped>
-/* 页面容器 - */
+/* 页面容器 */
 .knowledge-page {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   display: flex;
   flex-direction: column;
-  height: 100vh;
   width: 100%;
   max-width: 375px;
   margin: 0 auto;
   background: white;
+  overflow: hidden;
 }
 
 /* 内容容器  */
