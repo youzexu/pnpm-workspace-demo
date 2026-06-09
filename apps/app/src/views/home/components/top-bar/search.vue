@@ -42,11 +42,15 @@ const loading = ref(false)
 <style scoped>
 /* 整体容器 */
 .search-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   display: flex;
   flex-direction: column;
   width: 100%;
   max-width: 500px;
-  height: 100vh;
   background: white;
   margin: 0 auto;
   overflow: hidden;

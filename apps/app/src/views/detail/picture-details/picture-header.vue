@@ -23,7 +23,7 @@ import type { UserItem } from '@/utils/mockData'
 const props = defineProps<{
   userData: Pick<
     UserItem,
-    'id' | 'name' | 'avatar' | 'isFollowed' | 'followStatus' | 'notesCount' | 'collectionsCount'
+    'id' | 'name' | 'avatar' | 'isFollowed' | 'followStatus' | 'notesCount' | 'collectionsCount'|'bio'
   >
 }>()
 
@@ -53,7 +53,7 @@ const handleGoToUserDetail = () => {
     avatar: props.userData.avatar,
     isFollowed: props.userData.isFollowed,
     followStatus: props.userData.followStatus as '关注' | '已关注' | '互相关注',
-    bio: '',
+    bio: props.userData.bio,
     notesCount: props.userData.notesCount,
     collectionsCount: props.userData.collectionsCount
   }

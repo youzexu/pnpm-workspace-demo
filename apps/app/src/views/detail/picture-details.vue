@@ -70,10 +70,10 @@ const userData = ref({
   followStatus: '关注' as '关注' | '已关注' | '互相关注',
   createdAt: '',
   notesCount: 0,
-  collectionsCount: 0
+  collectionsCount: 0,
+  bio: ''
 })
 
-// 修复：添加 notesCount 和 collectionsCount
 const userHeaderData = computed(() => ({
   id: userData.value.id,
   name: userData.value.name,
@@ -81,7 +81,8 @@ const userHeaderData = computed(() => ({
   isFollowed: userData.value.isFollowed,
   followStatus: userData.value.followStatus,
   notesCount: userData.value.notesCount,
-  collectionsCount: userData.value.collectionsCount
+  collectionsCount: userData.value.collectionsCount,
+  bio: userData.value.bio
 }))
 
 // 获取 query 参数
@@ -119,7 +120,8 @@ const initData = () => {
         isCollected: item.isCollected || false,
         createdAt: item.createdAt || '',
         notesCount: item.author?.notesCount || item.notesCount || 0,
-        collectionsCount: item.author?.collectionsCount || item.collectionsCount || 0
+        collectionsCount: item.author?.collectionsCount || item.collectionsCount || 0,
+        bio: item.author?.bio || ''
       }
     } catch (error) {
       console.error('解析失败:', error)
@@ -183,10 +185,13 @@ onMounted(() => {
 
 <style scoped>
 .user-detail-page {
-  position: relative;
-  min-height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background: #fff;
+  overflow-y: auto;
   padding-bottom: 48px;
-  overflow-x: hidden;
 }
 </style>

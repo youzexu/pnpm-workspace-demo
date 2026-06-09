@@ -123,7 +123,8 @@ watch(
 .user-container {
   padding: 8px;
   overflow-y: auto;
-  max-height: calc(100vh - 120px);
+  flex: 1;
+  min-height: 0;
   scrollbar-width: thin;
 }
 
