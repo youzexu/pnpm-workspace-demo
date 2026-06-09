@@ -37,7 +37,7 @@ const loading = ref(false)
 const page = ref(1)
 const hasMore = ref(true)
 
-// 同步用户关注状态到列表
+// 点赞处理
 const handleToggleLike = (item: FeedItem) => {
   const result = likeStore.toggleLike(item.id, item.likes)
   item.isLiked = result.isLiked
@@ -65,7 +65,7 @@ const syncLikeStatus = () => {
 const saveDataToStore = () => {
   waterfallStore.saveRecommendData(feedList.value, page.value, hasMore.value)
 }
-
+// 数据恢复管理
 const restoreDataFromStore = (): boolean => {
   if (waterfallStore.recommendData.length > 0) {
     feedList.value = waterfallStore.recommendData
@@ -76,18 +76,18 @@ const restoreDataFromStore = (): boolean => {
   return false
 }
 
-//滚动位置管理 
+//滚动位置管理
 const handleScroll = (scrollTop: number) => {
   waterfallStore.saveRecommendScrollTop(scrollTop)
 }
-
+// 保存滚动位置管理
 const saveScrollPosition = () => {
   if (waterfallRef.value) {
     const scrollTop = waterfallRef.value.getScrollTop()
     waterfallStore.saveRecommendScrollTop(scrollTop)
   }
 }
-
+// 恢复滚动位置管理
 const restoreScrollPosition = async () => {
   await nextTick()
   const scrollTop = waterfallStore.recommendScrollTop

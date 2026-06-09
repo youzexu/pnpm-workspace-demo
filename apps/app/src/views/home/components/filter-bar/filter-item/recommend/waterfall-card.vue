@@ -17,6 +17,7 @@
           <img class="author-avatar" :src="item.author.avatar" />
           <span class="author-name">{{ item.author.name }}</span>
         </div>
+        <!-- 点赞信息区域  -->
         <div class="likes-info">
           <img
             class="likes-icon"

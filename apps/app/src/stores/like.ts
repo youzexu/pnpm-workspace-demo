@@ -1,4 +1,3 @@
-// stores/like.ts
 import { defineStore } from 'pinia'
 
 export interface LikeStatus {
